@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Tokens de diseño. Para cambiar la paleta cuando haya marca, se cambia acá y nada más.
+  Contrastes verificados (WCAG AA):
+  - tinta, tinta-suave, tierra, verde y error pasan 4.5:1 sobre marfil, crema y papel.
+  - borde (#857768) pasa 3:1 sobre marfil y papel: es el de los campos de formulario.
+  - borde-suave es decorativo (separadores), nunca el único indicio de algo.
+*/
+@theme {
+  --color-marfil: #f5f3ef;
+  --color-crema: #e8e0d5;
+  --color-crema-claro: #efe8de;
+  --color-papel: #fffdf9;
+  --color-tinta: #0f1210;
+  --color-tinta-suave: #4b4f4a;
+  --color-tierra: #7a5a43;
+  --color-tierra-oscuro: #5e4433;
+  --color-tierra-claro: #efe4d8;
+  --color-verde: #2e6b51;
+  --color-verde-oscuro: #245541;
+  --color-verde-claro: #dceae2;
+  --color-error: #a3352a;
+  --color-error-claro: #f6e1dc;
+  --color-borde: #857768;
+  --color-borde-suave: #d5cabb;
+
+  --radius-tarjeta: 1.25rem;
+  --shadow-tarjeta: 0 1px 2px rgb(15 18 16 / 0.04), 0 8px 24px -12px rgb(15 18 16 / 0.12);
+  --shadow-elevada: 0 2px 4px rgb(15 18 16 / 0.05), 0 24px 48px -20px rgb(15 18 16 / 0.22);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-urbanist), ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--color-marfil);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem; /* 17 px: legible en celular sin zoom */
+    line-height: 1.55;
+    font-feature-settings: "ss01" off;
+  }
+  /* Foco visible y consistente en todo lo que se puede tocar con teclado. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-tierra);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+  ::selection {
+    background: var(--color-tierra-claro);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .numeros-tabulares {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Impresión (QR del consultorio, comprobantes): sin navegación ni sombras. */
+@media print {
+  .no-imprimir {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
 }
