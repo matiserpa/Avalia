@@ -1,6 +1,6 @@
 # Pasaporte Profesional: producto
 
-> **Nombre provisorio.** Se cambia en `src/config/marca.ts` y `src/components/marca/Logo.tsx`.
+> **Nombre provisorio** ("Pasaporte Profesional" / "Avalia"): es una idea en exploración, sin marca ni dominio definidos. Se cambia en `src/config/marca.ts` y `src/components/marca/Logo.tsx`.
 
 ## Para qué sirve
 
@@ -108,7 +108,7 @@ Son las recomendaciones del análisis inicial, aplicadas por defecto.
 3. **Borrar la cuenta borra:** perfil, foto, contacto, sesiones, métricas, los códigos de ingreso y el registro de mails de ese mail. Los certificados quedan como registro de la institución, **desvinculados**, y siguen verificando. *A validar con el abogado.*
 4. **La verificación aclara su alcance:** "Confirmamos que [institución] emitió este certificado. No reemplaza la matrícula profesional."
 5. **El PDF acompaña al certificado de la institución, no lo reemplaza.** Usa un diseño estándar con el logo de la institución y no lleva DNI. **No guardamos DNI**: si la planilla lo trae, se ignora.
-6. **El dominio sale de `APP_URL`**, y es el que va en los QR impresos. Hay que definirlo antes del primer certificado real.
+6. **El dominio sale de `APP_URL`**, y es el que va en los QR. Por ahora no hay dominio ni nada impreso: se define antes de emitir certificados reales en el piloto.
 7. **Lo verificado y lo declarado se ven distintos.**
    - Verificado: los certificados que emitió una institución. Llevan sello verde.
    - Declarado por la profesional: profesión, ciudad, matrícula y contacto. No llevan sello, y la matrícula se rotula como "declarada".
