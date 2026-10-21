@@ -74,8 +74,12 @@ export function BotonLink({
   className,
   children,
   externo = false,
+  prefetch,
   ...resto
-}: Comunes & { href: string; externo?: boolean } & Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'href'>) {
+}: Comunes & { href: string; externo?: boolean; prefetch?: boolean } & Omit<
+  React.AnchorHTMLAttributes<HTMLAnchorElement>,
+  'href'
+>) {
   const clases = clasesBoton({ variante, tamano, anchoCompleto, className });
   const contenido = (
     <>
@@ -92,7 +96,7 @@ export function BotonLink({
     );
   }
   return (
-    <Link href={href} className={clases} {...resto}>
+    <Link href={href} className={clases} prefetch={prefetch} {...resto}>
       {contenido}
     </Link>
   );

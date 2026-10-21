@@ -72,6 +72,13 @@ export function fechaCorta(fecha: string | Date): string {
   );
 }
 
+// "21 de octubre de 2026, 15:30": para dejar constancia de cuándo se consultó algo.
+export function fechaHora(fecha: Date): string {
+  const dia = fechaLarga(fecha);
+  const hora = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: ZONA }).format(fecha);
+  return `${dia}, ${hora}`;
+}
+
 export function anioDe(fecha: string | Date): number {
   return typeof fecha === 'string' ? Number(fecha.slice(0, 4)) : Number(new Intl.DateTimeFormat('es-AR', { year: 'numeric', timeZone: ZONA }).format(fecha));
 }
