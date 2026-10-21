@@ -23,6 +23,8 @@ export function MarcoPanel({
   ancho?: 'normal' | 'ancho';
 }) {
   const max = ancho === 'ancho' ? 'max-w-6xl' : 'max-w-3xl';
+  // Con una sola sección no hace falta navegación: el logo vuelve al inicio.
+  const conNav = items.length > 1;
   return (
     <>
       <header className="no-imprimir sticky top-0 z-30 border-b border-borde-suave bg-marfil/95 backdrop-blur">
@@ -36,7 +38,7 @@ export function MarcoPanel({
             )}
           </Link>
           <div className="flex items-center gap-2">
-            <NavSuperior items={items} />
+            {conNav && <NavSuperior items={items} />}
             <form action={salir}>
               <button
                 type="submit"
@@ -49,13 +51,13 @@ export function MarcoPanel({
           </div>
         </div>
       </header>
-      <main id="contenido" className={`mx-auto w-full ${max} flex-1 px-4 pb-28 pt-6 sm:px-6 sm:pb-16 sm:pt-8`}>
+      <main id="contenido" className={`mx-auto w-full ${max} flex-1 px-4 ${conNav ? 'pb-28' : 'pb-16'} pt-6 sm:px-6 sm:pb-16 sm:pt-8`}>
         {children}
       </main>
-      <div className="hidden sm:block">
+      <div className={conNav ? 'hidden sm:block' : ''}>
         <Pie />
       </div>
-      <NavInferior items={items} />
+      {conNav && <NavInferior items={items} />}
     </>
   );
 }

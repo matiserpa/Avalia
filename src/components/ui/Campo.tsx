@@ -1,5 +1,6 @@
 // Campos de formulario con etiqueta real, ayuda y error asociados (aria-describedby).
-// El id sale del name: no repetir el mismo name dos veces en una página.
+// El id sale del name. Si el mismo name se repite en la página (por ejemplo, un formulario por
+// fila de una lista), pasá `idBase` distinto en cada uno.
 
 type Base = {
   etiqueta: string;
@@ -8,6 +9,7 @@ type Base = {
   error?: string;
   opcional?: boolean;
   className?: string;
+  idBase?: string;
 };
 
 function ids(name: string, ayuda: unknown, error: unknown) {
@@ -51,9 +53,10 @@ export function Campo({
   error,
   opcional,
   className = '',
+  idBase,
   ...input
 }: Base & Omit<React.ComponentProps<'input'>, 'name'>) {
-  const { id, describedBy } = ids(name, ayuda, error);
+  const { id, describedBy } = ids(idBase ?? name, ayuda, error);
   return (
     <div className={className}>
       <Etiqueta htmlFor={id} opcional={opcional}>
@@ -80,9 +83,10 @@ export function AreaTexto({
   error,
   opcional,
   className = '',
+  idBase,
   ...props
 }: Base & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'name'>) {
-  const { id, describedBy } = ids(name, ayuda, error);
+  const { id, describedBy } = ids(idBase ?? name, ayuda, error);
   return (
     <div className={className}>
       <Etiqueta htmlFor={id} opcional={opcional}>
@@ -110,9 +114,10 @@ export function Selector({
   opcional,
   className = '',
   opciones,
+  idBase,
   ...props
 }: Base & { opciones: { valor: string; texto: string }[] } & Omit<React.SelectHTMLAttributes<HTMLSelectElement>, 'name'>) {
-  const { id, describedBy } = ids(name, ayuda, error);
+  const { id, describedBy } = ids(idBase ?? name, ayuda, error);
   return (
     <div className={className}>
       <Etiqueta htmlFor={id} opcional={opcional}>
@@ -144,12 +149,13 @@ export function Casilla({
   children,
   error,
   className = '',
+  idBase,
   ...props
-}: { name: string; children: React.ReactNode; error?: string; className?: string } & Omit<
+}: { name: string; children: React.ReactNode; error?: string; className?: string; idBase?: string } & Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'name' | 'type'
 >) {
-  const id = `campo-${name}`;
+  const id = `campo-${idBase ?? name}`;
   return (
     <div className={className}>
       <label htmlFor={id} className="flex cursor-pointer items-start gap-3 rounded-xl py-1">

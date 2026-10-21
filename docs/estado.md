@@ -87,14 +87,19 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 - `/demo/enlace?email=...` además de `?codigo=...`.
 - El código de demo de Martina pasó a `MK8D2F6N`: el anterior tenía una L, que no existe en el alfabeto de los códigos y nunca se encontraba.
 
+## Hecho (etapa 4: panel de la institución)
+
+- `/institucion`: cursos con egresadas, emitidos y activados. `/institucion/cursos/nuevo`: alta con validación (carga horaria con coma, fecha).
+- `/institucion/cursos/[id]`: resumen, egresadas con su estado (sin certificado, mail enviado, no le llegó el mail, activó) y acciones:
+  - Con certificado: reenviar mail, copiar link (sólo si no activó; con botón para WhatsApp) y anular con motivo interno.
+  - Sin certificado: corregir datos y quitar (si nunca se le emitió nada).
+  - Agregar una egresada de a una.
+- `/institucion/cursos/[id]/cargar`: pegar filas de Excel o Google Sheets, o subir un CSV (coma o punto y coma). Reconoce encabezados ("Apellido y nombre", "Correo"…), separa nombre y apellido, capitaliza, marca errores por fila y **descarta el DNI**. Se revisa antes de confirmar. Lógica en `src/features/institucion/planilla.ts`.
+- `/institucion/cursos/[id]/emitir`: confirmación con la lista de nombres y el certificado de muestra (`/muestra`, con marca de agua). Si la egresada ya tiene su pasaporte con ese mail, el certificado se suma directo y el mail la invita a entrar, sin link de activación.
+- Toda consulta filtra por el `institucionId` de la sesión (`src/features/institucion/`); hay pruebas de que una institución no ve ni toca lo de otra.
+
 ## Falta (en este orden)
 
-4. **Panel de la institución:**
-   - Cursos (alta y detalle).
-   - Carga de egresadas: de a una, o pegando filas de la planilla, o con CSV.
-   - Emisión: un certificado por egresada y mail con link. Si ya tiene cuenta, se le vincula directo.
-   - Por certificado: estados, reenviar, copiar link para WhatsApp y anular con motivo.
-   - PDF de muestra.
 5. **Panel admin:** alta de instituciones con logo e invitación, y métricas del piloto (ver `docs/modelo-de-datos.md`).
 6. **Demo:**
    - `/demo`: guía del recorrido de 2 minutos, accesos rápidos y reiniciar.
