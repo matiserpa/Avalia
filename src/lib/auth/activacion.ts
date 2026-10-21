@@ -72,7 +72,10 @@ export async function consultarEnlace(token: string): Promise<EstadoEnlace> {
   if (!fila) return { estado: 'inexistente' };
   const email = fila.cert.email;
   if (fila.cert.estado === 'anulado') return { estado: 'anulado', email };
-  if (fila.enlace.usadoEn) return { estado: 'usado', email };
+  // Si el certificado ya está en una cuenta, sus links no sirven más para entrar: un link viejo
+  // (por ejemplo, uno que la institución mandó por WhatsApp) no puede abrir la cuenta de nadie.
+  // Desde ahí se entra con el código por mail.
+  if (fila.enlace.usadoEn || fila.cert.usuarioId) return { estado: 'usado', email };
   if (fila.enlace.expiraEn.getTime() < Date.now()) return { estado: 'vencido', email };
   return {
     estado: 'valido',

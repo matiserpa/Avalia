@@ -34,9 +34,15 @@ const PASOS: { icono: NombreIcono; titulo: string; texto: string }[] = [
   },
 ];
 
-export default function Portada() {
+export default async function Portada({ searchParams }: PageProps<'/'>) {
+  const sp = await searchParams;
   return (
     <PaginaPublica ancho="ancho" mostrarIngresar>
+      {sp.cuenta === 'borrada' && (
+        <Aviso tono="exito" titulo="Borramos tu cuenta" className="mb-6">
+          Tus datos ya no están en {MARCA.nombre}. Tus certificados siguen verificando con su código.
+        </Aviso>
+      )}
       {modoDemo() && (
         <Aviso tono="info" titulo="Estás en la demo" className="mb-6">
           Los datos son inventados.{' '}
@@ -114,7 +120,7 @@ export default function Portada() {
           />
           <Destinatario
             titulo="Instituciones"
-            texto="Emití certificados verificables sin cambiar cómo trabajás: cargás la planilla de egresadas y Sella hace el resto."
+            texto={`Emití certificados verificables sin cambiar cómo trabajás: cargás la planilla de egresadas y ${MARCA.nombre} hace el resto.`}
             accion={
               <BotonLink href={`mailto:${MARCA.emailContacto}`} variante="secundario" icono="mail" anchoCompleto>
                 Escribinos

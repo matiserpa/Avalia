@@ -120,6 +120,6 @@ En modo demo hay accesos directos que no piden código:
 - `/demo/entrar?email=valentina.rios@demo.example` (profesional)
 - `/demo/entrar?email=admin@demo.example` (admin)
 
-`/demo/enlace?codigo=ML8D2F6N` abre un link de activación nuevo para el certificado de Martina López, que todavía no activó.
+`/demo/enlace?codigo=MK8D2F6N` abre un link de activación nuevo para el certificado de Martina López, que todavía no activó.
 
 Los datos de prueba están en `src/lib/demo/semilla.ts`.

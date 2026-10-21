@@ -16,8 +16,12 @@ import { institucionesDe, porAnio, type DatosPerfil } from '@/features/publico/p
 import { urlImagen } from '@/lib/imagenes-url';
 import { cantidad, fechaLarga, horas, linkContacto, listaConY, nombreCompleto, TIPOS_CURSO, usuarioInstagram } from '@/lib/texto';
 
-export function VistaPerfil({ datos }: { datos: DatosPerfil }) {
+// `nivel` 2 cuando el perfil va dentro de otra página que ya tiene su título (la vista previa).
+export function VistaPerfil({ datos, nivel = 1 }: { datos: DatosPerfil; nivel?: 1 | 2 }) {
   const { perfil, certificados } = datos;
+  const H1 = nivel === 1 ? 'h1' : 'h2';
+  const H2 = nivel === 1 ? 'h2' : 'h3';
+  const H3 = nivel === 1 ? 'h3' : 'h4';
   const nombre = nombreCompleto(perfil);
   const grupos = porAnio(certificados);
   const instituciones = institucionesDe(certificados);
@@ -33,7 +37,7 @@ export function VistaPerfil({ datos }: { datos: DatosPerfil }) {
             tamano="xl"
             className="mx-auto"
           />
-          <h1 className="mt-5 text-[1.875rem] font-bold leading-tight tracking-tight">{nombre}</h1>
+          <H1 className="mt-5 text-[1.875rem] font-bold leading-tight tracking-tight">{nombre}</H1>
           {(perfil.profesion || perfil.ciudad) && (
             <p className="mt-1.5 text-[1.0625rem] text-tinta-suave">
               {perfil.profesion}
@@ -68,9 +72,9 @@ export function VistaPerfil({ datos }: { datos: DatosPerfil }) {
       </aside>
 
       <section aria-labelledby="formacion" className="mt-10 lg:mt-0">
-        <h2 id="formacion" className="text-[1.5rem] font-bold tracking-tight">
+        <H2 id="formacion" className="text-[1.5rem] font-bold tracking-tight">
           Formación verificada
-        </h2>
+        </H2>
         <p className="mt-1 text-tinta-suave">Cada certificado lo emitió la institución. Tocá Verificar para comprobarlo.</p>
 
         {grupos.length === 0 ? (
@@ -81,10 +85,10 @@ export function VistaPerfil({ datos }: { datos: DatosPerfil }) {
           <div className="mt-6 space-y-8">
             {grupos.map((g) => (
               <section key={g.anio} aria-labelledby={`anio-${g.anio}`}>
-                <h3 id={`anio-${g.anio}`} className="mb-3 flex items-center gap-3 text-[0.9375rem] font-bold text-tierra-oscuro">
+                <H3 id={`anio-${g.anio}`} className="mb-3 flex items-center gap-3 text-[0.9375rem] font-bold text-tierra-oscuro">
                   {g.anio}
                   <span aria-hidden="true" className="h-px flex-1 bg-borde-suave" />
-                </h3>
+                </H3>
                 <ul className="space-y-3">
                   {g.certificados.map((c) => (
                     <li key={c.id} className="flex gap-4 rounded-tarjeta border border-borde-suave bg-papel p-4 shadow-tarjeta sm:p-5">

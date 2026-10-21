@@ -17,6 +17,7 @@ export const COLORES = {
   tintaSuave: '#4B4F4A',
   tierra: '#7A5A43',
   tierraOscuro: '#5E4433',
+  tierraClaro: '#EFE4D8',
   verde: '#2E6B51',
   verdeOscuro: '#245541',
   verdeClaro: '#DCEAE2',

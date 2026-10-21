@@ -82,3 +82,17 @@
     background: #fff;
   }
 }
+
+/* Compartir: al imprimir, sólo la tarjeta con el QR, centrada. */
+@media print {
+  .bloque-compartir:not(:has(.tarjeta-qr)) {
+    display: none !important;
+  }
+  .bloque-compartir {
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  .tarjeta-qr {
+    margin-top: 2cm;
+  }
+}

@@ -1,4 +1,4 @@
-// Modelo de datos de Sella.
+// Modelo de datos del proyecto (el nombre de la marca vive en src/config/marca.ts).
 //
 // Tres ideas lo ordenan:
 // 1. El certificado es de la institución: guarda una COPIA del nombre de la titular al momento

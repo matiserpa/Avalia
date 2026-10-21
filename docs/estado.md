@@ -75,16 +75,20 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 - Los textos legales prometen cosas que hay que poder cumplir: que el piloto no tiene costo para las profesionales, que se avisa antes de cerrar el servicio para que descarguen sus certificados, y que si cambia la política se pide aceptarla de nuevo. Revisarlo con el abogado.
 - La política de privacidad avisa que, al compartir el link, WhatsApp e Instagram pueden guardar una vista previa con nombre y foto. Es así y no depende de nosotros.
 
+## Hecho (etapa 3: panel de la profesional)
+
+- `/activar/[token]`: muestra el certificado; activa sólo con la casilla de términos y privacidad tildada (error asociado al campo). Si quien abre el link ya tiene su pasaporte con otro mail, ofrece "Sumar a mi pasaporte".
+- **Seguridad:** un link de activación deja de servir para entrar en cuanto el certificado queda en una cuenta (`consultarEnlace`). Así un link viejo, por ejemplo uno que la institución mandó por WhatsApp, no abre la cuenta de nadie.
+- `/bienvenida` (consentimiento, si entró con código, y perfil en una pantalla) y `/bienvenida/listo` (vista previa con "Publicar mi perfil" o "Ahora no").
+- `/panel`: estado del perfil, link, certificados con interruptor "Mostrar en mi perfil" y descarga del PDF (registra `pdf_descarga`). Los anulados se listan aparte.
+- `/panel/perfil`: foto (se achica a WebP; la anterior se borra), profesión, ciudad, matrícula (con "Mostrarla en mi perfil"), contacto por WhatsApp o Instagram.
+- `/panel/compartir`: link para copiar o compartir, QR para imprimir (sólo la tarjeta) o descargar en PNG, e imagen para historias de 1080×1920. Cada acción registra `compartir` con su canal.
+- `/panel/cuenta`: público o privado, y borrar la cuenta (`src/features/profesional/cuenta.ts`). Al borrar, además, los links de activación sin usar de sus certificados dejan de servir.
+- `/demo/enlace?email=...` además de `?codigo=...`.
+- El código de demo de Martina pasó a `MK8D2F6N`: el anterior tenía una L, que no existe en el alfabeto de los códigos y nunca se encontraba.
+
 ## Falta (en este orden)
 
-3. **Panel de la profesional:**
-   - `/activar/[token]`.
-   - `/bienvenida`: consentimiento y perfil en una pantalla.
-   - `/bienvenida/listo`: vista previa y Publicar.
-   - `/panel`: certificados, visibilidad y PDF.
-   - `/panel/perfil`.
-   - `/panel/compartir`: link, QR para imprimir e imagen para historias de 1080×1920.
-   - `/panel/cuenta`: público o privado, y borrar la cuenta.
 4. **Panel de la institución:**
    - Cursos (alta y detalle).
    - Carga de egresadas: de a una, o pegando filas de la planilla, o con CSV.

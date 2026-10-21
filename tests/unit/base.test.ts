@@ -60,3 +60,12 @@ describe('demo y PDF', () => {
     await writeFile('.data/pruebas/muestra.pdf', muestra);
   });
 });
+
+describe('datos de demo', () => {
+  it('los códigos fijos son válidos (sin I, L, O ni U)', async () => {
+    const { DEMO } = await import('@/lib/demo/datos');
+    for (const c of [DEMO.codigoValentinaFormacion, DEMO.codigoValentinaMasterclass, DEMO.codigoAnulado, DEMO.codigoNoActivado]) {
+      expect(normalizarCodigo(c)).toBe(c);
+    }
+  });
+});

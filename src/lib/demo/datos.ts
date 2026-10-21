@@ -11,5 +11,5 @@ export const DEMO = {
   codigoValentinaFormacion: 'VR4K7M2P',
   codigoValentinaMasterclass: 'VR9Q3H6T',
   codigoAnulado: 'SH5A0E9R',
-  codigoNoActivado: 'ML8D2F6N',
+  codigoNoActivado: 'MK8D2F6N',
 } as const;
