@@ -14,7 +14,7 @@ import * as schema from './schema';
 
 export type Db = ReturnType<typeof drizzlePostgres<typeof schema>>;
 
-type Global = typeof globalThis & { __avalyaDb?: Db; __avalyaPglite?: PGlite };
+type Global = typeof globalThis & { __sellaDb?: Db; __sellaPglite?: PGlite };
 const g = globalThis as Global;
 
 export function directorioPglite() {
@@ -29,18 +29,31 @@ function crearDb(): Db {
     return drizzlePostgres(cliente, { schema, casing: 'snake_case' });
   }
   // Un solo PGlite por proceso: dos instancias sobre la misma carpeta la corrompen.
-  g.__avalyaPglite ??= new PGlite(directorioPglite());
-  return drizzlePglite(g.__avalyaPglite, { schema, casing: 'snake_case' }) as unknown as Db;
+  g.__sellaPglite ??= new PGlite(directorioPglite());
+  return drizzlePglite(g.__sellaPglite, { schema, casing: 'snake_case' }) as unknown as Db;
 }
 
-export const db: Db = (g.__avalyaDb ??= crearDb());
+// La conexión se abre recién en la primera consulta, no al importar este archivo. En desarrollo,
+// Next importa las páginas también en procesos auxiliares (para revisar sus rutas) que nunca
+// consultan nada: si cada uno abriera PGlite sobre la misma carpeta, la base se dañaría.
+function real(): Db {
+  return (g.__sellaDb ??= crearDb());
+}
+
+export const db: Db = new Proxy({} as Db, {
+  get(_destino, prop) {
+    const instancia = real();
+    const valor = Reflect.get(instancia, prop, instancia);
+    return typeof valor === 'function' ? valor.bind(instancia) : valor;
+  },
+});
 
 export function usaPglite() {
   return !process.env.DATABASE_URL;
 }
 
 export function clientePglite(): PGlite | undefined {
-  return g.__avalyaPglite;
+  return g.__sellaPglite;
 }
 
 export { schema };
