@@ -2,7 +2,7 @@
 
 Prototipo y piloto de certificados verificables y perfil profesional para la estética.
 
-Antes de tocar código, leé:
+Antes de tocar código, leé `docs/estado.md` (qué está hecho y qué sigue) y además:
 - `docs/producto.md`: qué es, mapa de pantallas, flujos, decisiones, privacidad y tono.
 - `docs/modelo-de-datos.md`: las tablas y por qué.
 - `docs/arquitectura.md`: stack, carpetas, reglas de Next 16, permisos, diseño y cómo correrlo.
