@@ -33,7 +33,9 @@ export async function iniciarSesion(usuarioId: string): Promise<void> {
     secure: cookieSegura(),
     sameSite: 'lax',
     path: '/',
-    expires: expiraEn,
+    // La cookie dura más que la sesión: así, cuando la sesión vence, Ingresar puede explicar que
+    // se cerró (la sesión vencida no vale igual: se mira en la base).
+    expires: new Date(expiraEn.getTime() + DURACION_MS),
   });
 }
 

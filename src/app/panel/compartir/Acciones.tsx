@@ -14,7 +14,7 @@ export function CopiarLink({ texto, etiqueta }: { texto: string; etiqueta: strin
 }
 
 // "Compartir" del celular (WhatsApp, Instagram, mail…). Sólo aparece si el navegador lo permite.
-export function CompartirNativo({ url, titulo }: { url: string; titulo: string }) {
+export function CompartirNativo({ url, titulo, texto }: { url: string; titulo: string; texto: string }) {
   const [disponible, setDisponible] = useState(false);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- se sabe recién en el navegador
@@ -28,7 +28,7 @@ export function CompartirNativo({ url, titulo }: { url: string; titulo: string }
       anchoCompleto
       onClick={async () => {
         try {
-          await navigator.share({ title: titulo, text: 'Mirá mi formación verificada', url });
+          await navigator.share({ title: titulo, text: texto, url });
           void registrarCompartir('compartir_nativo');
         } catch {
           // Canceló: no pasa nada.

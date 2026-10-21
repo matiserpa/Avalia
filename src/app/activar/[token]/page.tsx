@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 import { PaginaPublica } from '@/components/layout/EncabezadoPublico';
 import { Aviso } from '@/components/ui/Aviso';
 import { BotonLink } from '@/components/ui/Boton';
@@ -7,6 +8,7 @@ import { LogoInstitucion } from '@/components/ui/LogoInstitucion';
 import { SelloVerificado } from '@/components/ui/Sello';
 import { consultarEnlace, type EstadoEnlace } from '@/lib/auth/activacion';
 import { sesionActual } from '@/lib/auth/sesion';
+import { consentimientoVigente } from '@/lib/legales';
 import { fechaLarga, nombreCompleto } from '@/lib/texto';
 import { FormularioActivar, FormularioSumar } from './Formularios';
 
@@ -20,8 +22,10 @@ export default async function PaginaActivar({ params }: PageProps<'/activar/[tok
   if (e.estado !== 'valido') return <LinkQueNoSirve estado={e.estado} />;
 
   const s = await sesionActual();
-  // Sumar sólo si quien mira ya es una profesional con su pasaporte y el certificado es de otro mail.
-  const esProfesional = Boolean(s?.usuario.aceptoLegalesEn && !s.usuario.institucionId && !s.esAdmin);
+  // Sumar sólo si quien mira ya es una profesional con su pasaporte (y los términos vigentes
+  // aceptados) y el certificado es de otro mail. Con los términos viejos, primero los acepta.
+  if (s && s.usuario.aceptoLegalesEn && !consentimientoVigente(s.usuario) && !s.usuario.institucionId && !s.esAdmin) redirect('/bienvenida');
+  const esProfesional = Boolean(s && consentimientoVigente(s.usuario) && !s.usuario.institucionId && !s.esAdmin);
   const sumarAOtraCuenta = esProfesional && s!.usuario.email !== e.email;
   const c = e.certificado;
 

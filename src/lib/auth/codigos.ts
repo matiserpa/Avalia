@@ -3,8 +3,9 @@
 // Puede pedir código: quien ya tiene cuenta, quien tiene certificados emitidos a ese mail
 // (todavía sin activar) y los administradores. A cualquier otro mail no se le manda nada, pero
 // la respuesta es la misma: así nadie puede averiguar si un mail está en la plataforma. Por eso
-// el límite por hora tampoco avisa nada, y el mail sale después de responder (con `programar`),
-// para que el tiempo de respuesta no lo delate.
+// el límite por hora tampoco avisa nada, y todo lo que depende del mail (si puede ingresar, el
+// límite, el código y el envío) pasa después de responder (con `programar`), para que el tiempo
+// de respuesta no lo delate.
 
 import 'server-only';
 import { and, desc, eq, gt, isNull, lt, sql } from 'drizzle-orm';
@@ -40,13 +41,18 @@ function hashCodigo(email: string, codigo: string) {
 
 export async function solicitarCodigo(
   emailCrudo: string,
-  // Cómo mandar el mail. En una acción de servidor, `after` de Next: sale después de responder.
+  // Cuándo hacer el resto. En una acción de servidor, `after` de Next: después de responder.
   programar: (tarea: () => Promise<void>) => void | Promise<void> = (tarea) => tarea(),
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const email = normalizarEmail(emailCrudo);
   if (!email) return { ok: false, error: 'Escribí tu mail.' };
   if (!emailValido(email)) return { ok: false, error: 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.' };
-  if (!(await puedeIngresar(email))) return { ok: true };
+  await programar(() => mandarCodigo(email));
+  return { ok: true };
+}
+
+async function mandarCodigo(email: string): Promise<void> {
+  if (!(await puedeIngresar(email))) return;
 
   const haceUnaHora = new Date(Date.now() - 60 * 60 * 1000);
   const recientes = await db
@@ -55,9 +61,9 @@ export async function solicitarCodigo(
     .where(and(eq(codigosIngreso.email, email), gt(codigosIngreso.creadoEn, haceUnaHora)))
     .orderBy(desc(codigosIngreso.creadoEn));
   // Con el límite alcanzado, o si pidió uno hace menos de un minuto (el anterior sigue sirviendo),
-  // no mandamos otro. La respuesta es la de siempre.
-  if (recientes.length >= MAX_CODIGOS_POR_HORA) return { ok: true };
-  if (recientes[0] && Date.now() - recientes[0].creadoEn.getTime() < ESPERA_ENTRE_CODIGOS_MS) return { ok: true };
+  // no mandamos otro.
+  if (recientes.length >= MAX_CODIGOS_POR_HORA) return;
+  if (recientes[0] && Date.now() - recientes[0].creadoEn.getTime() < ESPERA_ENTRE_CODIGOS_MS) return;
 
   const codigo = codigoNumerico(6);
   await db.insert(codigosIngreso).values({
@@ -65,11 +71,8 @@ export async function solicitarCodigo(
     codigoHash: hashCodigo(email, codigo),
     expiraEn: new Date(Date.now() + VIGENCIA_MS),
   });
-  await programar(async () => {
-    const envio = await enviarCorreo(correoCodigo(email, codigo));
-    if (!envio.ok) console.error('No salió un mail con código de ingreso.');
-  });
-  return { ok: true };
+  const envio = await enviarCorreo(correoCodigo(email, codigo));
+  if (!envio.ok) console.error('No salió un mail con código de ingreso.');
 }
 
 // Devuelve el id del usuario (creándolo si hace falta) o un error para mostrar.

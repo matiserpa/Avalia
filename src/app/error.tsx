@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { PaginaPublica } from '@/components/layout/EncabezadoPublico';
 import { Boton, BotonLink } from '@/components/ui/Boton';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
+import { MARCA } from '@/config/marca';
 
 export default function ErrorGeneral({ error, retry }: { error: unknown; retry: () => void }) {
   useEffect(() => {
@@ -32,7 +33,15 @@ export default function ErrorGeneral({ error, retry }: { error: unknown; retry: 
         }
       >
         <p>No pudimos mostrar esta página. Probá de nuevo en un momento.</p>
-        {digest && <p className="mt-3 text-[0.875rem]">Si nos escribís, pasanos este código: {digest}</p>}
+        {digest && (
+          <p className="mt-3 text-[0.875rem]">
+            Si nos escribís a{' '}
+            <a href={`mailto:${MARCA.emailContacto}`} className="font-semibold underline underline-offset-4">
+              {MARCA.emailContacto}
+            </a>
+            , pasanos este código: {digest}
+          </p>
+        )}
       </EstadoVacio>
     </PaginaPublica>
   );

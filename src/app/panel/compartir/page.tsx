@@ -64,7 +64,7 @@ export default async function Compartir({ searchParams }: PageProps<'/panel/comp
         <Bloque titulo="Tu link" bajada="Para WhatsApp, tu bio de Instagram o donde quieras.">
           <div className="space-y-3">
             <CopiarLink texto={`${base}?c=link`} etiqueta="Link de tu perfil" />
-            <CompartirNativo url={`${base}?c=link`} titulo={nombre} />
+            <CompartirNativo url={`${base}?c=link`} titulo={nombre} texto={conSello ? 'Mirá mi formación verificada' : 'Mirá mi perfil profesional'} />
           </div>
         </Bloque>
 

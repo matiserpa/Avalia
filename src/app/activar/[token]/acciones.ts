@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation';
 import { activarConEnlace, sumarCertificadoConEnlace } from '@/lib/auth/activacion';
 import { iniciarSesion, sesionActual } from '@/lib/auth/sesion';
+import { consentimientoVigente } from '@/lib/legales';
 
 export type EstadoActivacion = { error?: string; errorAcepto?: string };
 
@@ -25,7 +26,7 @@ export async function activar(_prev: EstadoActivacion, fd: FormData): Promise<Es
 export async function sumar(_prev: EstadoActivacion, fd: FormData): Promise<EstadoActivacion> {
   const token = String(fd.get('token') || '');
   const s = await sesionActual();
-  if (!s || !s.usuario.aceptoLegalesEn || s.usuario.institucionId || s.esAdmin) {
+  if (!s || !consentimientoVigente(s.usuario) || s.usuario.institucionId || s.esAdmin) {
     return { error: 'Tu sesión se cerró. Volvé a abrir el link del mail.' };
   }
   const r = await sumarCertificadoConEnlace(token, s.usuario.id);
