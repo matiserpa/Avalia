@@ -54,15 +54,29 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
   - Vitest con PGlite en memoria (`npm test`).
   - Configuración de Playwright para celular y escritorio (`npm run test:e2e`).
 
+## Hecho (etapas 1 y 2)
+
+- **Verificación pública** (`/verificar`, `/v/[código]`):
+  - Estados válido (verde), anulado y no encontrado. Muestra "Consultado el …" por si sacan captura.
+  - Aclaración de alcance: "No reemplaza la matrícula profesional".
+  - Link al perfil sólo si es público **y** ella no ocultó ese certificado.
+  - Nunca muestra el mail ni el motivo de una anulación.
+- **Perfil público** (`/p/[slug]`, componente `VistaPerfil`, que también sirve para la vista previa de la profesional):
+  - Formación agrupada por año con el logo de cada institución. Sello verde sólo en los certificados; matrícula rotulada "declarada".
+  - Privado o inexistente: el mismo 404, con los mismos metadatos. La dueña ve el suyo con un aviso.
+  - Vista previa para redes (`opengraph-image`): con datos sólo si el perfil es público; si no, la imagen genérica de la marca.
+- **Portada** `/` (la única que se indexa), **legales en borrador** (`/terminos`, `/privacidad`, con lo que falta marcado como [COMPLETAR]), `not-found` y `error` globales.
+- **Métricas:** `verificacion`, `verificacion_fallida` y `perfil_visita` con canal. No cuentan la dueña, la institución emisora (en verificaciones), la administración ni los programas que arman vistas previas de links (WhatsApp, Instagram…): se mira el navegador en el momento y no se guarda.
+- **Arreglo de la base local:** la conexión se abre en la primera consulta (`src/db/index.ts`). Antes, los procesos auxiliares de Next abrían PGlite sobre la misma carpeta y la dañaban. `npm run demo:reiniciar` ahora borra la carpeta de PGlite y la crea de cero.
+- **Pruebas:** de lógica (`tests/unit`) y de punta a punta (`tests/e2e`, celular y escritorio).
+
+## Para confirmar con el cliente (surgió en las etapas 1 y 2)
+
+- Los textos legales prometen cosas que hay que poder cumplir: que el piloto no tiene costo para las profesionales, que se avisa antes de cerrar el servicio para que descarguen sus certificados, y que si cambia la política se pide aceptarla de nuevo. Revisarlo con el abogado.
+- La política de privacidad avisa que, al compartir el link, WhatsApp e Instagram pueden guardar una vista previa con nombre y foto. Es así y no depende de nosotros.
+
 ## Falta (en este orden)
 
-1. **Verificación pública:** `/verificar` y `/v/[código]`, con los estados válido, anulado y no encontrado. Va con aclaración de alcance y link al perfil si es público. Registra el evento `verificacion` con canal.
-2. **Perfil público:** `/p/[slug]`.
-   - Formación agrupada por año, con el logo de cada institución.
-   - Lo verificado con sello y lo declarado sin sello.
-   - Imagen de vista previa para WhatsApp e Instagram (`opengraph-image`).
-   - El mismo mensaje si es privado o no existe.
-   - Además: portada `/`, textos legales en borrador (`/terminos` y `/privacidad`), `not-found` y `error` globales.
 3. **Panel de la profesional:**
    - `/activar/[token]`.
    - `/bienvenida`: consentimiento y perfil en una pantalla.

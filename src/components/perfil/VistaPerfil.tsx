@@ -130,7 +130,16 @@ export function VistaPerfil({ datos }: { datos: DatosPerfil }) {
 function Contacto({ tipo, valor }: { tipo: 'whatsapp' | 'instagram' | null; valor: string | null }) {
   const href = linkContacto(tipo, valor);
   if (!href || !tipo) return null;
-  const texto = tipo === 'whatsapp' ? 'Escribirle por WhatsApp' : `Instagram @${usuarioInstagram(valor ?? '')}`;
+  // Instagram: el usuario a la vista (el ícono ya dice qué red es) y el nombre de la red para el
+  // lector de pantalla. Si es largo, se corta con puntos suspensivos en vez de ocupar dos renglones.
+  const texto =
+    tipo === 'whatsapp' ? (
+      'Escribirle por WhatsApp'
+    ) : (
+      <span className="min-w-0 truncate">
+        <span className="sr-only">Instagram: </span>@{usuarioInstagram(valor ?? '')}
+      </span>
+    );
   return (
     <BotonLink
       href={href}
@@ -139,7 +148,7 @@ function Contacto({ tipo, valor }: { tipo: 'whatsapp' | 'instagram' | null; valo
       variante="secundario"
       icono={tipo}
       anchoCompleto
-      className="mt-5"
+      className="mt-5 max-w-full"
     >
       {texto}
     </BotonLink>

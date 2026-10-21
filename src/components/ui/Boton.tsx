@@ -95,6 +95,14 @@ export function BotonLink({
       </a>
     );
   }
+  // Mails y teléfonos: un link común, que abre la aplicación de correo.
+  if (/^(mailto|tel):/.test(href)) {
+    return (
+      <a href={href} className={clases} {...resto}>
+        {contenido}
+      </a>
+    );
+  }
   return (
     <Link href={href} className={clases} prefetch={prefetch} {...resto}>
       {contenido}

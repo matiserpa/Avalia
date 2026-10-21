@@ -4,9 +4,9 @@ import { PaginaPublica } from '@/components/layout/EncabezadoPublico';
 import { VistaPerfil } from '@/components/perfil/VistaPerfil';
 import { Aviso } from '@/components/ui/Aviso';
 import { BotonLink } from '@/components/ui/Boton';
-import { institucionesDe, perfilPorSlug } from '@/features/publico/perfil';
+import { institucionesDe, perfilPorSlug, registrarVisitaPerfil } from '@/features/publico/perfil';
 import { sesionActual } from '@/lib/auth/sesion';
-import { canalDesdeParametro, esRobot, registrarEvento } from '@/lib/eventos';
+import { canalDesdeParametro } from '@/lib/eventos';
 import { cantidad, listaConY, nombreCompleto } from '@/lib/texto';
 
 // Si el perfil es privado o no existe, la respuesta es la misma (incluidos los metadatos): nadie
@@ -31,9 +31,7 @@ export default async function PaginaPerfil({ params, searchParams }: PageProps<'
   const esDuena = Boolean(datos && s?.usuario.id === datos.perfil.usuarioId);
   if (!datos || (!datos.perfil.publico && !esDuena)) notFound();
 
-  if (!esDuena && !s?.esAdmin && !(await esRobot())) {
-    await registrarEvento({ tipo: 'perfil_visita', canal: canalDesdeParametro(sp.c), perfilUsuarioId: datos.perfil.usuarioId });
-  }
+  await registrarVisitaPerfil(datos.perfil.usuarioId, s, canalDesdeParametro(sp.c));
 
   return (
     <PaginaPublica ancho="ancho">

@@ -18,10 +18,11 @@ import {
 } from '@/db/schema';
 import { urlBase } from '@/lib/config';
 import { hashSecreto, tokenAleatorio } from '@/lib/cripto';
+import { VERSION_LEGALES } from '@/lib/legales';
 import { capitalizarNombre, slugificar } from '@/lib/texto';
 import { obtenerOCrearUsuario } from './codigos';
 
-export const VERSION_LEGALES = '2026-10-borrador';
+export { VERSION_LEGALES };
 const VIGENCIA_ENLACE_MS = 45 * 24 * 60 * 60 * 1000;
 
 // Crea un link nuevo para un certificado. Devuelve la URL completa: es la única vez que existe.

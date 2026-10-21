@@ -8,7 +8,9 @@ import 'server-only';
 import { cache } from 'react';
 import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
-import { certificados, cursos, instituciones, perfiles, type Perfil, type TipoCurso } from '@/db/schema';
+import { certificados, cursos, instituciones, perfiles, type Canal, type Perfil, type TipoCurso } from '@/db/schema';
+import type { SesionActual } from '@/lib/auth/sesion';
+import { esRobot, registrarEvento } from '@/lib/eventos';
 import { anioDe } from '@/lib/texto';
 
 export type CertificadoDePerfil = {
@@ -77,4 +79,12 @@ export function porAnio(lista: CertificadoDePerfil[]): { anio: number; certifica
 // "Instituto Demo y Asociación Demo de Cosmiatría"
 export function institucionesDe(lista: CertificadoDePerfil[]): string[] {
   return [...new Set(lista.map((c) => c.institucion))];
+}
+
+// Una visita al perfil público. No cuentan la dueña, la administración ni los programas que arman
+// vistas previas de links.
+export async function registrarVisitaPerfil(perfilUsuarioId: string, sesion: SesionActual | null, canal: Canal): Promise<void> {
+  if (sesion && (sesion.usuario.id === perfilUsuarioId || sesion.esAdmin)) return;
+  if (await esRobot()) return;
+  await registrarEvento({ tipo: 'perfil_visita', canal, perfilUsuarioId });
 }

@@ -5,6 +5,7 @@
 - **Next.js 16.4 (App Router) + React 19 + TypeScript + Tailwind v4.** Es un solo proyecto, con páginas, acciones y rutas que devuelven PDF o PNG.
 - **Postgres con Drizzle ORM.**
   - Sin `DATABASE_URL` usa **PGlite**: Postgres corriendo dentro de Node, con los datos en `.data/pglite`. Se corre local sin instalar nada.
+  - La conexión se abre en la primera consulta, no al importar `src/db`: Next importa las páginas también en procesos auxiliares, y dos PGlite sobre la misma carpeta la dañan.
   - Con `DATABASE_URL` usa **postgres-js**, por ejemplo contra Supabase en el piloto.
 - **Ingreso propio, sin contraseñas.**
   - Código de 6 dígitos por mail (`src/lib/auth/codigos.ts`).
@@ -108,7 +109,7 @@ Para leer la sesión sin redirigir (por ejemplo, para no contar la visita de la 
 npm install
 cp .env.example .env.local      # o crealo con DEMO_MODE=true
 npm run dev                     # http://localhost:3000 (con DEMO_MODE=true carga los datos de prueba)
-npm run demo:reiniciar          # borra todo y vuelve a cargar la demo (con el servidor apagado)
+npm run demo:reiniciar          # borra la base (con PGlite, la carpeta entera) y vuelve a cargar la demo, con el servidor apagado
 npm test                        # pruebas de lógica
 npm run test:e2e                # pruebas de punta a punta (levanta su propio servidor)
 npm run typecheck && npm run lint
