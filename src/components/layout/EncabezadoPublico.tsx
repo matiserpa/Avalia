@@ -14,15 +14,16 @@ export function EncabezadoPublico({
 }) {
   return (
     <header className="no-imprimir">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
-        <Link href="/" aria-label="Ir a la portada" className="rounded-lg">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-4 sm:gap-4 sm:px-6 sm:py-5">
+        <Link href="/" className="rounded-lg">
           <Logo compacto />
+          <span className="sr-only">, ir a la portada</span>
         </Link>
         <div className="flex items-center gap-1 sm:gap-2">
           {mostrarVerificar && (
             <Link
               href="/verificar"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 font-semibold text-tinta hover:bg-crema-claro"
+              className="inline-flex min-h-12 items-center gap-2 rounded-full px-2.5 font-semibold text-tinta hover:bg-crema-claro min-[360px]:px-3"
             >
               <Icono nombre="lupa" />
               <span>Verificar</span>
@@ -31,7 +32,7 @@ export function EncabezadoPublico({
           {mostrarIngresar && (
             <Link
               href="/ingresar"
-              className="inline-flex min-h-11 items-center rounded-full border border-borde px-4 font-semibold text-tinta hover:bg-crema-claro"
+              className="inline-flex min-h-12 items-center rounded-full border border-borde px-3.5 font-semibold text-tinta hover:bg-crema-claro min-[360px]:px-4"
             >
               Ingresar
             </Link>
@@ -48,11 +49,14 @@ export function PaginaPublica({
   ancho = 'normal',
   mostrarVerificar,
   mostrarIngresar,
+  clasePie,
 }: {
   children: React.ReactNode;
   ancho?: 'angosto' | 'normal' | 'ancho';
   mostrarVerificar?: boolean;
   mostrarIngresar?: boolean;
+  // Por ejemplo, espacio abajo cuando hay una barra fija de acciones en el celular.
+  clasePie?: string;
 }) {
   const max = { angosto: 'max-w-xl', normal: 'max-w-3xl', ancho: 'max-w-5xl' }[ancho];
   return (
@@ -61,7 +65,7 @@ export function PaginaPublica({
       <main id="contenido" className={`mx-auto w-full ${max} flex-1 px-4 pb-16 pt-2 sm:px-6 sm:pt-6`}>
         {children}
       </main>
-      <Pie />
+      <Pie className={clasePie} />
     </>
   );
 }

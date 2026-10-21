@@ -21,7 +21,7 @@ export default async function Bandeja({ searchParams }: PageProps<'/demo/bandeja
   return (
     <PaginaPublica ancho="ancho">
       <div className="pt-4 sm:pt-6">
-        <Link href="/demo" className="mb-3 inline-flex min-h-10 items-center gap-1.5 font-semibold text-tinta-suave hover:text-tinta">
+        <Link href="/demo" className="mb-3 inline-flex min-h-12 items-center gap-1.5 font-semibold text-tinta-suave hover:text-tinta">
           <Icono nombre="flecha-izq" />
           Guía de la demo
         </Link>
@@ -55,7 +55,7 @@ export default async function Bandeja({ searchParams }: PageProps<'/demo/bandeja
             {abierto ? (
               <article aria-labelledby="asunto" className="overflow-hidden rounded-tarjeta border border-borde-suave bg-papel shadow-tarjeta">
                 <div className="border-b border-borde-suave p-4 sm:p-5">
-                  <Link href="/demo/bandeja" className="mb-2 inline-flex min-h-10 items-center gap-1.5 font-semibold text-tinta-suave hover:text-tinta lg:hidden">
+                  <Link href="/demo/bandeja" className="mb-2 inline-flex min-h-12 items-center gap-1.5 font-semibold text-tinta-suave hover:text-tinta lg:hidden">
                     <Icono nombre="flecha-izq" />
                     Todos los mails
                   </Link>

@@ -1,6 +1,9 @@
+import type { Metadata } from 'next';
 import { PaginaPublica } from '@/components/layout/EncabezadoPublico';
 import { BotonLink } from '@/components/ui/Boton';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
+
+export const metadata: Metadata = { title: 'Página no encontrada' };
 
 export default function NoEncontrada() {
   return (

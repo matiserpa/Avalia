@@ -8,6 +8,13 @@
       "when": 1792596398335,
       "tag": "0000_inicial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792614012303,
+      "tag": "0001_tipo_jornada",
+      "breakpoints": true
     }
   ]
 }

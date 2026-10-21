@@ -10,14 +10,14 @@ test.describe('panel admin', () => {
     await page.goto('/demo/entrar?email=admin@demo.example');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Instituciones');
 
-    await page.getByRole('button', { name: 'Crear institución y mandar la invitación' }).click();
+    await page.getByRole('button', { name: 'Crear y mandar la invitación' }).click();
     await expect(page.getByLabel('Nombre de la institución')).toHaveAttribute('aria-invalid', 'true');
 
     await page.getByLabel('Nombre de la institución').fill(nombre);
     await page.getByLabel('Ciudad').fill('Bariloche');
     await page.getByLabel('Logo').setInputFiles({ name: 'logo.png', mimeType: 'image/png', buffer: PNG });
     await page.getByLabel('Mail de la persona responsable').fill(email);
-    await page.getByRole('button', { name: 'Crear institución y mandar la invitación' }).click();
+    await page.getByRole('button', { name: 'Crear y mandar la invitación' }).click();
     await expect(page.getByText(`Creamos ${nombre} y le mandamos la invitación a ${email}.`)).toBeVisible();
     await expect(page.getByRole('heading', { name: nombre })).toBeVisible();
     await expect(page.getByText(email, { exact: true })).toBeVisible();

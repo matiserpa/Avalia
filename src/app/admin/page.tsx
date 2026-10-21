@@ -21,7 +21,7 @@ export default async function Instituciones() {
             Instituciones del piloto
           </h2>
           {lista.length === 0 ? (
-            <EstadoVacio icono="edificio" titulo="Todavía no hay instituciones">
+            <EstadoVacio icono="edificio" titulo="Todavía no hay instituciones" nivel="h3">
               Creá la primera con el formulario.
             </EstadoVacio>
           ) : (

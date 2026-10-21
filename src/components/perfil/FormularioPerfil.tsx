@@ -10,6 +10,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { BotonEnviar } from '@/components/ui/BotonEnviar';
 import { Campo, Casilla, Selector } from '@/components/ui/Campo';
 import { Icono } from '@/components/ui/Icono';
+import { esperarImagenes, prepararCampoImagen } from '@/lib/achicar-imagen';
 import { PROFESIONES } from '@/lib/texto';
 
 export type ValoresPerfil = {
@@ -29,6 +30,8 @@ export type EstadoFormPerfil = {
   ok?: boolean;
   errores?: Partial<Record<keyof ValoresPerfil | 'foto' | 'acepto', string>>;
   valores?: ValoresPerfil;
+  // Si había elegido una foto: el formulario vuelve sin ella y hay que pedirle que la elija de nuevo.
+  habiaArchivo?: boolean;
 };
 
 export function FormularioPerfil({
@@ -51,10 +54,14 @@ export function FormularioPerfil({
   const e = estado.errores ?? {};
   const hayErrores = Object.keys(e).length > 0;
   return (
-    <form key={estado.intento} action={enviar} className="space-y-8" noValidate>
+    <form key={estado.intento} action={enviar} onSubmit={esperarImagenes} className="space-y-8" noValidate>
       {hayErrores && (
         <Aviso tono="error" titulo="Revisá los datos marcados">
-          {e.foto ? 'Si elegiste una foto, volvé a elegirla.' : 'Corregilos y volvé a intentar.'}
+          {e.foto
+            ? 'Elegí otra foto o seguí sin foto.'
+            : estado.habiaArchivo
+              ? 'Corregilos y volvé a elegir la foto: la guardamos recién cuando está todo bien.'
+              : 'Corregilos y volvé a intentar.'}
         </Aviso>
       )}
       {estado.ok && textoOk && <Aviso tono="exito">{textoOk}</Aviso>}
@@ -124,7 +131,11 @@ export function FormularioPerfil({
 function Foto({ fotoUrl, nombre, apellido, error }: { fotoUrl: string | null; nombre: string; apellido: string; error?: string }) {
   const [vista, setVista] = useState<string | null>(null);
   const [quitar, setQuitar] = useState(false);
+  // El error del navegador (la foto pesa demasiado) se muestra igual que el del servidor.
+  const [errorLocal, setErrorLocal] = useState<string | undefined>();
+  const [preparando, setPreparando] = useState(false);
   const mostrada = vista ?? (quitar ? null : fotoUrl);
+  const errorFoto = errorLocal ?? error;
   return (
     <div>
       <p id="foto-etiqueta" className="mb-3 font-semibold">
@@ -145,12 +156,16 @@ function Foto({ fotoUrl, nombre, apellido, error }: { fotoUrl: string | null; no
               type="file"
               accept="image/*"
               className="sr-only"
-              aria-describedby={error ? 'campo-foto-error' : 'campo-foto-ayuda'}
-              aria-invalid={error ? true : undefined}
-              onChange={(ev) => {
-                const f = ev.currentTarget.files?.[0];
-                setVista(f ? URL.createObjectURL(f) : null);
-                if (f) setQuitar(false);
+              aria-describedby={errorFoto ? 'campo-foto-error' : 'campo-foto-ayuda'}
+              aria-invalid={errorFoto ? true : undefined}
+              onChange={async (ev) => {
+                // Se achica antes de subirla: el hosting rechaza envíos de más de 4,5 MB.
+                setPreparando(true);
+                const { archivo, error: e } = await prepararCampoImagen(ev.currentTarget);
+                setPreparando(false);
+                setErrorLocal(e);
+                setVista(archivo ? URL.createObjectURL(archivo) : null);
+                if (archivo) setQuitar(false);
               }}
             />
           </label>
@@ -164,9 +179,12 @@ function Foto({ fotoUrl, nombre, apellido, error }: { fotoUrl: string | null; no
       <p id="campo-foto-ayuda" className="mt-2 text-[0.9375rem] text-tinta-suave">
         Una foto tuya, de frente y con buena luz. Si no subís ninguna, se muestran tus iniciales.
       </p>
-      {error && (
+      <p aria-live="polite" className="text-[0.9375rem] font-medium text-tinta">
+        {preparando ? 'Preparando la foto…' : ''}
+      </p>
+      {errorFoto && (
         <p id="campo-foto-error" className="mt-1.5 text-[0.9375rem] font-medium text-error">
-          {error}
+          {errorFoto}
         </p>
       )}
     </div>

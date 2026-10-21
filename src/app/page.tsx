@@ -20,7 +20,7 @@ const PASOS: { icono: NombreIcono; titulo: string; texto: string }[] = [
   {
     icono: 'edificio',
     titulo: 'La institución emite',
-    texto: 'Carga a sus egresadas y emite los certificados. A cada una le llega un mail para activar su pasaporte.',
+    texto: 'Carga a sus egresadas y emite los certificados. A cada una le mandamos un mail para que active su pasaporte.',
   },
   {
     icono: 'usuario',

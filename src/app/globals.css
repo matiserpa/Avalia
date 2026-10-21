@@ -59,6 +59,19 @@
   ::selection {
     background: var(--color-tierra-claro);
   }
+  /* El encabezado fijo de los paneles no tapa lo que tiene el foco (por ejemplo, con Shift+Tab). */
+  html:has([data-encabezado-fijo]) {
+    scroll-padding-top: 5.5rem;
+  }
+  /* En el celular, la barra fija de abajo no tapa lo que tiene el foco: el navegador deja ese lugar. */
+  @media (max-width: 639px) {
+    html:has([data-barra-inferior]) {
+      scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom));
+    }
+    html:has([data-barra-inferior="doble"]) {
+      scroll-padding-bottom: calc(10.5rem + env(safe-area-inset-bottom));
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

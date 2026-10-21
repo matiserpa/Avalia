@@ -82,7 +82,7 @@ export default async function MiPasaporte({ searchParams }: PageProps<'/panel'>)
         </p>
 
         {validos.length === 0 ? (
-          <EstadoVacio titulo="Tu pasaporte está vacío" className="mt-6">
+          <EstadoVacio titulo="Tu pasaporte está vacío" className="mt-6" nivel="h3">
             Cuando una institución te emita un certificado a tu mail, aparece acá.
           </EstadoVacio>
         ) : (

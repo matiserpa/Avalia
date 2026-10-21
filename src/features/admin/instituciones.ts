@@ -88,7 +88,7 @@ export async function crearInstitucion(d: {
   if (Object.keys(errores).length > 0) return { ok: false, errores };
 
   // Logos: sin recortar, para que entren enteros.
-  const img = await guardarImagen(d.logo!, { lado: 512 });
+  const img = await guardarImagen(d.logo!, { lado: 512, permitirSvg: true });
   if (!img.ok) return { ok: false, errores: { logo: img.error } };
   const [inst] = await db.insert(instituciones).values({ nombre, ciudad: ciudad || null, logoId: img.id }).returning();
   const envio = await invitar(email, inst.id, inst.nombre);

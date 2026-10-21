@@ -56,15 +56,20 @@ export function validarCurso(c: CamposCurso): { errores: ErroresCurso; datos?: O
   if (!nombre) errores.nombre = 'Escribí el nombre del curso, como figura en el certificado.';
   const tipo = (tipoCurso.enumValues as readonly string[]).includes(c.tipo) ? (c.tipo as TipoCurso) : null;
   if (!tipo) errores.tipo = 'Elegí el tipo de curso.';
-  const horas = Number(c.cargaHoraria.replace(',', '.').trim());
-  if (!c.cargaHoraria.trim() || !Number.isFinite(horas) || horas <= 0 || horas > 5000) {
+  // En la Argentina el punto separa los miles: "1.200" son mil doscientas horas, no 1,2.
+  const escrita = c.cargaHoraria.trim();
+  const horas = Number((/^\d{1,3}(\.\d{3})+$/.test(escrita) ? escrita.replace(/\./g, '') : escrita).replace(',', '.'));
+  if (!escrita || !Number.isFinite(horas) || horas <= 0 || horas > 5000) {
     errores.cargaHoraria = 'Escribí la carga horaria en horas, por ejemplo 16 o 2,5.';
   }
   const fecha = /^\d{4}-\d{2}-\d{2}$/.test(c.fecha) ? c.fecha : '';
-  const anio = Number(fecha.slice(0, 4));
+  const [anio, mes, dia] = fecha.split('-').map(Number);
+  const elegida = new Date(Date.UTC(anio, mes - 1, dia));
+  // Que exista de verdad: Date.parse acepta "2026-02-31" (lo pasa al 3 de marzo).
+  const existe = Boolean(fecha) && elegida.getUTCFullYear() === anio && elegida.getUTCMonth() === mes - 1 && elegida.getUTCDate() === dia;
   const limite = new Date();
   limite.setFullYear(limite.getFullYear() + 1);
-  if (!fecha || Number.isNaN(Date.parse(fecha)) || anio < 1980 || new Date(fecha) > limite) {
+  if (!existe || anio < 1980 || elegida > limite) {
     errores.fecha = 'Elegí la fecha en que se realizó o terminó el curso.';
   }
   if (Object.keys(errores).length > 0) return { errores };
@@ -117,7 +122,14 @@ export async function egresadasDelCurso(institucionId: string, cursoId: string):
   return lista.map((e) => {
     const propios = certs.filter((c) => c.egresadaId === e.id);
     const valido = propios.find((c) => c.estado === 'valido') ?? null;
-    const estado: EstadoEgresada = !valido ? 'sin_emitir' : valido.usuarioId ? 'activado' : valido.mailError ? 'error_mail' : 'emitido';
+    // Sin mailEnviadoEn, el mail nunca salió (por ejemplo, se cortó la emisión): se puede reenviar.
+    const estado: EstadoEgresada = !valido
+      ? 'sin_emitir'
+      : valido.usuarioId
+        ? 'activado'
+        : valido.mailError || !valido.mailEnviadoEn
+          ? 'error_mail'
+          : 'emitido';
     return {
       id: e.id,
       nombre: e.nombre,

@@ -13,10 +13,10 @@ test.describe('panel de la institución', () => {
       await page.getByRole('link', { name: /Congreso Demo 2026/ }).click();
     } else {
       // En escritorio, un curso nuevo con su planilla (el congreso ya se emitió en celular).
-      await page.getByRole('link', { name: 'Nuevo curso' }).click();
+      await page.getByRole('link', { name: 'Crear un curso' }).click();
       await page.getByRole('button', { name: 'Crear curso' }).click();
       await expect(page.getByLabel('Nombre del curso')).toHaveAttribute('aria-invalid', 'true');
-      await page.getByLabel('Nombre del curso').fill('Workshop Demo: Microneedling');
+      await page.getByLabel('Nombre del curso').fill('Taller Demo de Microneedling');
       await page.getByLabel('Tipo').selectOption('workshop');
       await page.getByLabel('Carga horaria').fill('4,5');
       await page.getByLabel('Fecha').fill('2026-10-01');
@@ -39,7 +39,7 @@ test.describe('panel de la institución', () => {
     await expect(page.getByText(/^Emitimos \d+ certificados?$/)).toBeVisible();
     await expect(page.getByText('Mail enviado, no activó').first()).toBeVisible();
 
-    await page.getByRole('button', { name: 'Copiar link' }).first().click();
+    await page.getByRole('button', { name: 'Crear link para WhatsApp' }).first().click();
     await expect(page.getByText(/^Link nuevo para/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Mandar por WhatsApp' })).toHaveAttribute('href', /^https:\/\/wa\.me\/\?text=/);
 
@@ -54,7 +54,7 @@ test.describe('panel de la institución', () => {
 
   test('una institución no entra a los cursos de otra', async ({ page }) => {
     await page.goto('/demo/entrar?email=asociacion@demo.example');
-    const ajeno = await page.getByRole('link', { name: /Workshop Demo: Dermaplaning/ }).getAttribute('href');
+    const ajeno = await page.getByRole('link', { name: /Taller Demo de Dermaplaning/ }).getAttribute('href');
     await entrarComoInstituto(page);
     expect((await page.goto(ajeno!))?.status()).toBe(404);
   });

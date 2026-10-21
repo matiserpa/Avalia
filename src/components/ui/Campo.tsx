@@ -19,7 +19,7 @@ function ids(name: string, ayuda: unknown, error: unknown) {
 }
 
 const CLASE_CONTROL =
-  'block w-full min-h-12 rounded-xl border border-borde bg-papel px-4 py-3 text-[1.0625rem] text-tinta placeholder:text-tinta-suave/70 aria-[invalid=true]:border-error aria-[invalid=true]:border-2';
+  'block w-full min-h-12 rounded-xl border border-borde bg-papel px-4 py-3 text-[1.0625rem] text-tinta placeholder:text-tinta-suave aria-[invalid=true]:border-error aria-[invalid=true]:border-2';
 
 export function Etiqueta({ htmlFor, children, opcional }: { htmlFor: string; children: React.ReactNode; opcional?: boolean }) {
   return (

@@ -1,5 +1,5 @@
 // Sesiones: una cookie httpOnly con un token al azar; en la base, sólo su hash.
-// Duran 30 días y se renuevan solas cuando falta menos de la mitad.
+// Duran 30 días desde que se ingresa: después hay que pedir un código nuevo.
 
 import 'server-only';
 import { cookies } from 'next/headers';
@@ -8,6 +8,7 @@ import { db } from '@/db';
 import { perfiles, sesiones, usuarios, type Perfil, type Usuario } from '@/db/schema';
 import { cookieSegura, esEmailAdmin } from '@/lib/config';
 import { hashSecreto, tokenAleatorio } from '@/lib/cripto';
+import { consentimientoVigente } from '@/lib/legales';
 
 export const COOKIE_SESION = 'pp_sesion';
 const DURACION_MS = 30 * 24 * 60 * 60 * 1000;
@@ -64,7 +65,7 @@ export async function sesionActual(): Promise<SesionActual | null> {
 export function destinoInicial(s: SesionActual): string {
   if (s.esAdmin) return '/admin';
   if (s.usuario.institucionId) return '/institucion';
-  if (!s.usuario.aceptoLegalesEn) return '/bienvenida';
+  if (!consentimientoVigente(s.usuario)) return '/bienvenida';
   if (!s.perfil) return '/bienvenida';
   return '/panel';
 }

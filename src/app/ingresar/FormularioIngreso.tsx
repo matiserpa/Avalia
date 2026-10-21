@@ -111,9 +111,10 @@ function PasoCodigo({
       </div>
 
       <details className="rounded-2xl border border-borde-suave bg-papel p-4">
-        <summary className="cursor-pointer font-semibold">¿No te llega el código?</summary>
+        <summary className="flex min-h-12 cursor-pointer items-center font-semibold">¿No te llega el código?</summary>
         <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
           <li>Esperá un par de minutos y revisá las carpetas de spam y promociones.</li>
+          <li>Si pediste varios códigos seguidos, esperá una hora antes de pedir otro.</li>
           <li>Fijate que el mail esté bien escrito: {estado.email}.</li>
           <li>Probá con el mail que le diste a la institución que te emitió el certificado.</li>
           <li>Si nada de eso funciona, pedile a tu institución que te reenvíe el link de activación.</li>

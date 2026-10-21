@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { solicitarCodigo, verificarCodigo } from '@/lib/auth/codigos';
 import { destinoInicial, iniciarSesion, sesionActual } from '@/lib/auth/sesion';
 import { normalizarEmail } from '@/lib/texto';
@@ -18,7 +19,7 @@ export async function accionIngreso(_prev: EstadoIngreso, fd: FormData): Promise
   const intencion = String(fd.get('intencion') || 'pedir');
 
   if (intencion === 'pedir' || intencion === 'reenviar') {
-    const r = await solicitarCodigo(email);
+    const r = await solicitarCodigo(email, after);
     if (!r.ok) return { paso: intencion === 'reenviar' ? 'codigo' : 'email', email, error: r.error };
     return { paso: 'codigo', email, pedidoEn: Date.now() };
   }

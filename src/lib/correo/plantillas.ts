@@ -47,9 +47,13 @@ export function correoCertificado(d: {
   enlace: string;
   yaTieneCuenta: boolean;
   certificadoId: string;
+  // La institución lo vuelve a mandar: no es un certificado nuevo.
+  reenvio?: boolean;
 }): Correo {
   const asunto = d.yaTieneCuenta
-    ? `Tenés un certificado nuevo de ${d.institucion}`
+    ? d.reenvio
+      ? `Tu certificado de ${d.curso} está en tu pasaporte`
+      : `Tenés un certificado nuevo de ${d.institucion}`
     : `${d.institucion} te emitió un certificado`;
   const intro = d.yaTieneCuenta
     ? `<p style="margin:0 0 12px;">Hola, ${escapar(d.nombre)}:</p>

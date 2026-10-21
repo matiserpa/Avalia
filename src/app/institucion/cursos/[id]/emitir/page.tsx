@@ -1,18 +1,19 @@
 import type { Metadata } from 'next';
 import { notFound, redirect } from 'next/navigation';
 import { TituloPagina } from '@/components/layout/MarcoPanel';
+import { Aviso } from '@/components/ui/Aviso';
 import { BotonEnviar } from '@/components/ui/BotonEnviar';
 import { Icono } from '@/components/ui/Icono';
 import { obtenerCurso } from '@/features/institucion/cursos';
-import { pendientesDeEmitir } from '@/features/institucion/emision';
+import { firmaDeLista, pendientesDeEmitir } from '@/features/institucion/emision';
 import { requerirInstitucion } from '@/lib/auth/guardas';
 import { emitir } from '../../../acciones';
 
 export const metadata: Metadata = { title: 'Emitir certificados' };
 
-export default async function Emitir({ params }: PageProps<'/institucion/cursos/[id]/emitir'>) {
+export default async function Emitir({ params, searchParams }: PageProps<'/institucion/cursos/[id]/emitir'>) {
   const s = await requerirInstitucion();
-  const { id } = await params;
+  const [{ id }, sp] = await Promise.all([params, searchParams]);
   const curso = await obtenerCurso(s.institucionId, id);
   if (!curso) notFound();
   const pendientes = await pendientesDeEmitir(s.institucionId, id);
@@ -23,10 +24,15 @@ export default async function Emitir({ params }: PageProps<'/institucion/cursos/
   return (
     <div className="max-w-2xl">
       <TituloPagina titulo={boton} bajada={curso.nombre} volver={{ href: `/institucion/cursos/${id}`, texto: 'Volver al curso' }} />
+      {sp.cambio && (
+        <Aviso tono="atencion" titulo="La lista cambió" className="mb-6">
+          Mientras la revisabas, alguien agregó o corrigió una egresada. No emitimos nada: revisá los nombres de nuevo.
+        </Aviso>
+      )}
 
       <ul className="space-y-3 rounded-tarjeta border border-borde-suave bg-papel p-5 text-tinta-suave shadow-tarjeta sm:p-6">
         <Paso icono="check-circulo">Cada egresada recibe un certificado con su código y su QR, verificable desde ese momento.</Paso>
-        <Paso icono="mail">Le llega un mail para activar su pasaporte. Si ya tiene uno con ese mail, el certificado se suma solo.</Paso>
+        <Paso icono="mail">Le mandamos un mail para que active su pasaporte. Si ya tiene uno con ese mail, el certificado se suma solo.</Paso>
         <Paso icono="info">
           Un certificado emitido no se edita. Si después encontrás un error, lo anulás y emitís otro.{' '}
           <a href={`/institucion/cursos/${id}/muestra`} target="_blank" rel="noopener" className="font-semibold text-tinta underline underline-offset-4">
@@ -57,6 +63,7 @@ export default async function Emitir({ params }: PageProps<'/institucion/cursos/
 
       <form action={emitir} className="mt-8">
         <input type="hidden" name="cursoId" value={id} />
+        <input type="hidden" name="firma" value={firmaDeLista(pendientes)} />
         <BotonEnviar tamano="lg" anchoCompleto icono="check-circulo" textoEnviando="Emitiendo y mandando los mails…">
           {boton}
         </BotonEnviar>

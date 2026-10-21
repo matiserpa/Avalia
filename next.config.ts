@@ -24,8 +24,9 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      // Fotos de celular de hasta 8 MB (se achican al guardarlas).
-      bodySizeLimit: '10mb',
+      // Vercel corta en 4,5 MB por envío: las fotos se achican en el navegador y el servidor
+      // acepta hasta 4 MB (src/lib/imagenes.ts).
+      bodySizeLimit: '4.5mb',
     },
   },
   poweredByHeader: false,

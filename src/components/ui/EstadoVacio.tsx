@@ -13,8 +13,9 @@ export function EstadoVacio({
   children?: React.ReactNode;
   accion?: React.ReactNode;
   className?: string;
-  // h1 cuando el estado vacío es toda la página (por ejemplo, un perfil no disponible).
-  nivel?: 'h1' | 'h2';
+  // h1 cuando el estado vacío es toda la página (por ejemplo, un perfil no disponible); dentro
+  // de una sección, un nivel más que el título de esa sección.
+  nivel?: 'h1' | 'h2' | 'h3' | 'h4';
 }) {
   const Titulo = nivel;
   return (

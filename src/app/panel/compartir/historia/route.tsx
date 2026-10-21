@@ -64,7 +64,9 @@ export async function GET(req: Request) {
 
         {/* El pie va fijo, por encima de la zona donde Instagram pone sus botones. */}
         <div style={{ position: 'absolute', left: 0, right: 0, bottom: 230, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <span style={{ fontSize: 44, fontWeight: 700, color: C.tinta }}>Mirá mi formación verificada</span>
+          <span style={{ fontSize: 44, fontWeight: 700, color: C.tinta }}>
+            {certificados.length > 0 ? 'Mirá mi formación verificada' : 'Mirá mi perfil profesional'}
+          </span>
           <span style={{ marginTop: 18, fontSize: 34, color: C.tierraOscuro, background: C.tierraClaro, borderRadius: 999, padding: '14px 34px' }}>{link}</span>
         </div>
       </div>

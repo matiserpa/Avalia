@@ -18,6 +18,8 @@ export async function GET(req: Request) {
   if (!u) return new Response('No existe una persona de prueba con ese mail', { status: 404 });
   await iniciarSesion(u.id);
   const s = await sesionActual();
-  const destino = url.searchParams.get('a') || (s ? destinoInicial(s) : '/');
-  return NextResponse.redirect(new URL(destino.startsWith('/') ? destino : '/', url));
+  const inicial = s ? destinoInicial(s) : '/';
+  // Sólo destinos de este sitio: "//otro-sitio" o "/\otro-sitio" también empiezan con barra.
+  const pedido = new URL(url.searchParams.get('a') || inicial, url);
+  return NextResponse.redirect(pedido.origin === url.origin ? pedido : new URL(inicial, url));
 }

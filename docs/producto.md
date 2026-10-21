@@ -46,7 +46,7 @@ Dura 3 meses, en Patagonia, con dos instituciones y decenas de personas. Queremo
 |---|---|
 | `/activar/[token]` | Llega desde el mail: ve su certificado, acepta términos y privacidad y activa |
 | `/bienvenida` | Consentimiento, si entró por código, y después completar el perfil (una pantalla) |
-| `/bienvenida/listo` | Vista previa del perfil con "Publicar mi perfil" o "Ahora no" |
+| `/bienvenida/listo` | Vista previa del perfil con "Publicar mi perfil" o "Seguir sin publicar" |
 | `/panel` | Mi pasaporte: estado del perfil, compartir y sus certificados con interruptor de visibilidad y PDF |
 | `/panel/perfil` | Editar datos del perfil |
 | `/panel/compartir` | Link corto, QR para imprimir e imagen para historias de Instagram |

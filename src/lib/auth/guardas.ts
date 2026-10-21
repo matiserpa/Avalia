@@ -2,19 +2,22 @@
 // los permisos se chequean en el servidor, siempre, aunque la interfaz ya oculte lo que no corresponde.
 
 import 'server-only';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { sesionActual, type SesionActual } from './sesion';
+import { consentimientoVigente } from '@/lib/legales';
+import { COOKIE_SESION, sesionActual, type SesionActual } from './sesion';
 
 export async function requerirSesion(): Promise<SesionActual> {
   const s = await sesionActual();
-  if (!s) redirect('/ingresar');
+  // Si tenía una sesión que se cerró o venció, Ingresar se lo explica.
+  if (!s) redirect((await cookies()).has(COOKIE_SESION) ? '/ingresar?motivo=sesion' : '/ingresar');
   return s;
 }
 
-// Profesional con consentimiento dado. Sin consentimiento, a /bienvenida.
+// Profesional con el consentimiento de la versión vigente. Si no, a /bienvenida.
 export async function requerirProfesional(): Promise<SesionActual & { perfil: NonNullable<SesionActual['perfil']> }> {
   const s = await requerirSesion();
-  if (!s.usuario.aceptoLegalesEn || !s.perfil) redirect('/bienvenida');
+  if (!consentimientoVigente(s.usuario) || !s.perfil) redirect('/bienvenida');
   return s as SesionActual & { perfil: NonNullable<SesionActual['perfil']> };
 }
 

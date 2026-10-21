@@ -27,6 +27,7 @@ import {
 } from '@/db/schema';
 import { generarCodigo } from '@/lib/certificados/codigo';
 import { DEMO } from './datos';
+import { VERSION_LEGALES } from '@/lib/legales';
 
 export { DEMO };
 
@@ -141,7 +142,7 @@ export async function cargarDemo(): Promise<void> {
     .insert(cursos)
     .values({
       institucionId: asociacion.id,
-      nombre: 'Workshop Demo: Dermaplaning',
+      nombre: 'Taller Demo de Dermaplaning',
       tipo: 'workshop',
       cargaHoraria: 6,
       fecha: '2025-06-07',
@@ -153,7 +154,7 @@ export async function cargarDemo(): Promise<void> {
     .values({
       institucionId: asociacion.id,
       nombre: 'Jornada Demo de Actualización en Cosmiatría',
-      tipo: 'congreso',
+      tipo: 'jornada',
       cargaHoraria: 8,
       fecha: '2024-11-09',
       docente: 'Comisión científica de la Asociación Demo',
@@ -163,7 +164,7 @@ export async function cargarDemo(): Promise<void> {
   // ---------- profesionales con cuenta ----------
   const [valentina] = await db
     .insert(usuarios)
-    .values({ email: DEMO.emailValentina, aceptoLegalesEn: haceDias(40), versionLegales: '2026-10-borrador' })
+    .values({ email: DEMO.emailValentina, aceptoLegalesEn: haceDias(40), versionLegales: VERSION_LEGALES })
     .returning();
   await db.insert(perfiles).values({
     usuarioId: valentina.id,
@@ -182,7 +183,7 @@ export async function cargarDemo(): Promise<void> {
 
   const [julieta] = await db
     .insert(usuarios)
-    .values({ email: 'julieta.acosta@demo.example', aceptoLegalesEn: haceDias(30), versionLegales: '2026-10-borrador' })
+    .values({ email: 'julieta.acosta@demo.example', aceptoLegalesEn: haceDias(30), versionLegales: VERSION_LEGALES })
     .returning();
   await db.insert(perfiles).values({
     usuarioId: julieta.id,
@@ -196,7 +197,7 @@ export async function cargarDemo(): Promise<void> {
 
   const [agustina] = await db
     .insert(usuarios)
-    .values({ email: 'agustina.molina@demo.example', aceptoLegalesEn: haceDias(25), versionLegales: '2026-10-borrador' })
+    .values({ email: 'agustina.molina@demo.example', aceptoLegalesEn: haceDias(25), versionLegales: VERSION_LEGALES })
     .returning();
   await db.insert(perfiles).values({
     usuarioId: agustina.id,

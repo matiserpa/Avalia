@@ -19,20 +19,21 @@ export default async function Listo() {
       Compartir mi perfil
     </BotonLink>
   ) : (
-    <div className="flex flex-col gap-2 sm:flex-row">
-      <form action={publicar} className="sm:flex-1">
+    <div className="flex flex-col gap-2 sm:grid sm:grid-cols-2">
+      <form action={publicar}>
         <BotonEnviar tamano="lg" anchoCompleto icono="mundo" textoEnviando="Publicando…">
           Publicar mi perfil
         </BotonEnviar>
       </form>
-      <BotonLink href="/panel" tamano="lg" variante="secundario" className="sm:flex-1">
-        Ahora no
+      <BotonLink href="/panel" tamano="lg" variante="secundario">
+        Seguir sin publicar
       </BotonLink>
     </div>
   );
 
   return (
-    <PaginaPublica ancho="ancho" mostrarVerificar={false}>
+    // En el celular, el espacio para la barra fija va después del pie, así no tapa sus links.
+    <PaginaPublica ancho="ancho" mostrarVerificar={false} clasePie={publico ? 'pb-28 sm:pb-0' : 'pb-44 sm:pb-0'}>
       <div className="pt-4 sm:pt-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
@@ -58,8 +59,7 @@ export default async function Listo() {
         </section>
 
         {/* En el celular, las acciones quedan abajo, al alcance del pulgar. */}
-        <div className="h-36 sm:hidden" aria-hidden="true" />
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-borde-suave bg-papel/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur sm:hidden">
+        <div data-barra-inferior={publico ? '' : 'doble'} className="fixed inset-x-0 bottom-0 z-30 border-t border-borde-suave bg-papel/95 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 backdrop-blur sm:hidden">
           {acciones}
         </div>
       </div>

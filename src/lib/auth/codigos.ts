@@ -2,10 +2,12 @@
 //
 // Puede pedir código: quien ya tiene cuenta, quien tiene certificados emitidos a ese mail
 // (todavía sin activar) y los administradores. A cualquier otro mail no se le manda nada, pero
-// la respuesta es la misma: así nadie puede averiguar si un mail está en la plataforma.
+// la respuesta es la misma: así nadie puede averiguar si un mail está en la plataforma. Por eso
+// el límite por hora tampoco avisa nada, y el mail sale después de responder (con `programar`),
+// para que el tiempo de respuesta no lo delate.
 
 import 'server-only';
-import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, lt, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { certificados, codigosIngreso, usuarios } from '@/db/schema';
 import { esEmailAdmin } from '@/lib/config';
@@ -36,8 +38,13 @@ function hashCodigo(email: string, codigo: string) {
   return hashSecreto(`codigo:${email}:${codigo}`);
 }
 
-export async function solicitarCodigo(emailCrudo: string): Promise<{ ok: true } | { ok: false; error: string }> {
+export async function solicitarCodigo(
+  emailCrudo: string,
+  // Cómo mandar el mail. En una acción de servidor, `after` de Next: sale después de responder.
+  programar: (tarea: () => Promise<void>) => void | Promise<void> = (tarea) => tarea(),
+): Promise<{ ok: true } | { ok: false; error: string }> {
   const email = normalizarEmail(emailCrudo);
+  if (!email) return { ok: false, error: 'Escribí tu mail.' };
   if (!emailValido(email)) return { ok: false, error: 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.' };
   if (!(await puedeIngresar(email))) return { ok: true };
 
@@ -47,10 +54,9 @@ export async function solicitarCodigo(emailCrudo: string): Promise<{ ok: true } 
     .from(codigosIngreso)
     .where(and(eq(codigosIngreso.email, email), gt(codigosIngreso.creadoEn, haceUnaHora)))
     .orderBy(desc(codigosIngreso.creadoEn));
-  if (recientes.length >= MAX_CODIGOS_POR_HORA) {
-    return { ok: false, error: 'Pediste muchos códigos seguidos. Esperá unos minutos y probá de nuevo.' };
-  }
-  // Si pidió uno hace menos de un minuto, no mandamos otro: el anterior sigue sirviendo.
+  // Con el límite alcanzado, o si pidió uno hace menos de un minuto (el anterior sigue sirviendo),
+  // no mandamos otro. La respuesta es la de siempre.
+  if (recientes.length >= MAX_CODIGOS_POR_HORA) return { ok: true };
   if (recientes[0] && Date.now() - recientes[0].creadoEn.getTime() < ESPERA_ENTRE_CODIGOS_MS) return { ok: true };
 
   const codigo = codigoNumerico(6);
@@ -59,8 +65,10 @@ export async function solicitarCodigo(emailCrudo: string): Promise<{ ok: true } 
     codigoHash: hashCodigo(email, codigo),
     expiraEn: new Date(Date.now() + VIGENCIA_MS),
   });
-  const envio = await enviarCorreo(correoCodigo(email, codigo));
-  if (!envio.ok) return { ok: false, error: 'No pudimos mandar el mail. Probá de nuevo en unos minutos.' };
+  await programar(async () => {
+    const envio = await enviarCorreo(correoCodigo(email, codigo));
+    if (!envio.ok) console.error('No salió un mail con código de ingreso.');
+  });
   return { ok: true };
 }
 
@@ -80,13 +88,17 @@ export async function verificarCodigo(
     .orderBy(desc(codigosIngreso.creadoEn))
     .limit(1);
   if (!fila) return { ok: false, error: 'El código venció o ya se usó. Pedí uno nuevo.' };
-  if (fila.intentos >= MAX_INTENTOS) return { ok: false, error: 'Probaste demasiadas veces. Pedí un código nuevo.' };
+
+  // Cada intento se cuenta ANTES de comparar y en una sola sentencia: si llegan muchos pedidos
+  // juntos, cada uno gasta un intento y pasado el máximo ninguno se compara.
+  const intento = await db
+    .update(codigosIngreso)
+    .set({ intentos: sql`${codigosIngreso.intentos} + 1` })
+    .where(and(eq(codigosIngreso.id, fila.id), lt(codigosIngreso.intentos, MAX_INTENTOS), isNull(codigosIngreso.usadoEn)))
+    .returning({ id: codigosIngreso.id });
+  if (intento.length === 0) return { ok: false, error: 'Probaste demasiadas veces. Pedí un código nuevo.' };
 
   if (!igualesSeguro(fila.codigoHash, hashCodigo(email, codigo))) {
-    await db
-      .update(codigosIngreso)
-      .set({ intentos: sql`${codigosIngreso.intentos} + 1` })
-      .where(eq(codigosIngreso.id, fila.id));
     return { ok: false, error: 'Ese código no es correcto. Revisalo y probá de nuevo.' };
   }
 

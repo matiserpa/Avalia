@@ -8,7 +8,7 @@ export function Pie({ className = '' }: { className?: string }) {
         <p>
           {MARCA.nombre} · un servicio de {MARCA.responsable}
         </p>
-        <nav aria-label="Información legal" className="flex flex-wrap gap-x-5 gap-y-2">
+        <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5 gap-y-2">
           <Link href="/verificar" className="underline-offset-4 hover:underline">
             Verificar un certificado
           </Link>

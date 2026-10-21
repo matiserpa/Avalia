@@ -15,7 +15,7 @@ export default async function Cursos() {
   const [inst, cursos] = await Promise.all([obtenerInstitucion(s.institucionId), listarCursos(s.institucionId)]);
   const nuevo = (
     <BotonLink href="/institucion/cursos/nuevo" icono="mas">
-      Nuevo curso
+      Crear un curso
     </BotonLink>
   );
   return (
@@ -23,7 +23,7 @@ export default async function Cursos() {
       <TituloPagina titulo="Cursos" bajada={inst ? `Los certificados que emite ${inst.nombre}.` : undefined} accion={cursos.length > 0 && nuevo} />
       {cursos.length === 0 ? (
         <EstadoVacio titulo="Todavía no cargaste cursos" accion={nuevo}>
-          Creá el curso, cargá la planilla de egresadas y emití los certificados. Cada egresada recibe un mail para activar su
+          Creá el curso, cargá la planilla de egresadas y emití los certificados. A cada egresada le mandamos un mail para activar su
           pasaporte.
         </EstadoVacio>
       ) : (

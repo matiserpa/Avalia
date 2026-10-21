@@ -2,8 +2,9 @@
 // tabulador) o un CSV (con coma o punto y coma, como exporta Excel en español).
 //
 // Reconoce las columnas por su encabezado (Nombre, Apellido, Mail, "Apellido y nombre"...). Si no
-// hay encabezado, busca la columna con @ para el mail y usa las demás para el nombre.
-// La columna DNI, si viene, se ignora: no guardamos DNI.
+// hay encabezado, busca la columna con @ para el mail y usa las de texto para el nombre.
+// La columna DNI, si viene, se ignora: no guardamos DNI. Sin encabezado se reconoce por su
+// contenido, y un nombre con números se rechaza (por si el DNI cayó en la columna equivocada).
 
 import Papa from 'papaparse';
 import { capitalizarNombre, emailValido, normalizarEmail } from '@/lib/texto';
@@ -27,6 +28,17 @@ export type ResultadoPlanilla = {
 };
 
 type Columna = 'nombre' | 'apellido' | 'email' | 'completo' | 'apellidoNombre' | 'ignorar' | 'dni';
+
+// "30123456", "30.123.456", "DNI 30.123.456": letras sólo al principio y 6 dígitos o más.
+function pareceDocumento(celda: string) {
+  return celda.replace(/\D/g, '').length >= 6 && /^[a-zº°.:#\s]*[\d][\d.\s-]*$/i.test(celda.trim());
+}
+
+// ¿La mayoría de las celdas con algo cumplen la condición?
+function laMayoria(datos: string[][], i: number, condicion: (celda: string) => boolean) {
+  const llenas = datos.map((r) => r[i] ?? '').filter(Boolean);
+  return llenas.length > 0 && llenas.filter(condicion).length * 2 > llenas.length;
+}
 
 function sinTildes(s: string) {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
@@ -58,6 +70,16 @@ function separar(texto: string, formato: 'completo' | 'apellidoNombre'): { nombr
     : { nombre: partes.slice(0, -1).join(' '), apellido: partes[partes.length - 1] };
 }
 
+// Excel en Windows guarda el CSV en Windows-1252 (no en UTF-8): si no es UTF-8 válido, se lee así
+// para no romper tildes y eñes.
+export function textoDeArchivo(bytes: Uint8Array): string {
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    return new TextDecoder('windows-1252').decode(bytes);
+  }
+}
+
 export function leerPlanilla(texto: string): ResultadoPlanilla {
   const limpio = String(texto || '').replace(/^﻿/, '').trim();
   if (!limpio) return { filas: [], avisos: [], error: 'Pegá las filas de tu planilla o elegí un archivo.' };
@@ -78,14 +100,16 @@ export function leerPlanilla(texto: string): ResultadoPlanilla {
     cuerpo = datos.slice(1);
     primeraFila = 2;
   } else {
-    // Sin encabezado: el mail es la columna con @; las de texto antes del mail son el nombre.
+    // Sin encabezado: el mail es la columna con @; las de texto son el nombre. Una columna de
+    // números de documento se descarta aunque alguna celda diga "s/d".
     const ancho = Math.max(...datos.map((r) => r.length));
     const conArroba = Array.from({ length: ancho }, (_, i) => datos.filter((r) => (r[i] ?? '').includes('@')).length);
     const iMail = conArroba.indexOf(Math.max(...conArroba));
-    const deTexto = Array.from({ length: ancho }, (_, i) => i).filter(
-      (i) => i !== iMail && datos.some((r) => /[a-záéíóúñ]/i.test(r[i] ?? '')) && !datos.every((r) => /^[\d.\s-]*$/.test(r[i] ?? '')),
-    );
+    const indices = Array.from({ length: ancho }, (_, i) => i).filter((i) => i !== iMail);
+    const deDocumento = indices.filter((i) => laMayoria(datos, i, (c) => pareceDocumento(c) || !/[a-záéíóúñ]/i.test(c)) && datos.some((r) => pareceDocumento(r[i] ?? '')));
+    const deTexto = indices.filter((i) => !deDocumento.includes(i) && laMayoria(datos, i, (c) => /[a-záéíóúñ]/i.test(c) && !pareceDocumento(c)));
     columnas = Array.from({ length: ancho }, () => 'ignorar' as Columna);
+    for (const i of deDocumento) columnas[i] = 'dni';
     columnas[iMail] = 'email';
     if (deTexto.length >= 2) {
       columnas[deTexto[0]] = 'nombre';
@@ -95,7 +119,7 @@ export function leerPlanilla(texto: string): ResultadoPlanilla {
     }
     cuerpo = datos;
     primeraFila = 1;
-    avisos.push('La planilla no tiene encabezados: tomamos la columna con @ como mail y las anteriores como nombre y apellido. Revisalo abajo.');
+    avisos.push('La planilla no tiene encabezados: tomamos la columna con @ como mail y las dos primeras de texto como nombre y apellido. Revisalo abajo.');
   }
 
   if (!columnas.includes('email')) {
@@ -127,6 +151,8 @@ export function leerPlanilla(texto: string): ResultadoPlanilla {
       email: normalizarEmail(celda('email')),
     };
     if (!fila.nombre || !fila.apellido) fila.error = 'Falta el nombre o el apellido.';
+    else if (/\d/.test(fila.nombre + fila.apellido)) fila.error = 'El nombre o el apellido tiene números: revisá que no sea el DNI.';
+    else if ((fila.nombre + fila.apellido).includes('\uFFFD')) fila.error = 'Hay letras que no se leyeron bien. Guardá la planilla como "CSV UTF-8" y volvé a subirla.';
     else if (!emailValido(fila.email)) fila.error = fila.email ? 'El mail no es válido.' : 'Falta el mail.';
     else if (vistos.has(fila.email)) fila.error = 'Este mail está repetido en la planilla.';
     vistos.add(fila.email);

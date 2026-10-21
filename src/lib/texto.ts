@@ -11,22 +11,20 @@ export function emailValido(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(normalizarEmail(email));
 }
 
-// "  maría   josé " → "María José". Respeta partículas: "de", "del", "la".
+// "  maría   DE LOS ángeles " → "María de los Ángeles"; "D'ALESSANDRO" → "D'Alessandro". Respeta
+// partículas ("de", "del", "la") y las palabras escritas con una mayúscula en el medio, como
+// "MacKenzie" o "D'Angelo": esas quedan como las escribió la institución.
 export function capitalizarNombre(s: string): string {
   const minusculas = new Set(['de', 'del', 'la', 'las', 'los', 'y', 'da', 'do', 'dos', 'van', 'von']);
   return String(s || '')
     .trim()
     .replace(/\s+/g, ' ')
-    .toLowerCase()
     .split(' ')
-    .map((p, i) =>
-      i > 0 && minusculas.has(p)
-        ? p
-        : p
-            .split('-')
-            .map((q) => q.charAt(0).toLocaleUpperCase('es-AR') + q.slice(1))
-            .join('-'),
-    )
+    .map((p, i) => {
+      if (/\p{Lu}/u.test(p.slice(1)) && /\p{Ll}/u.test(p)) return p.charAt(0).toLocaleUpperCase('es-AR') + p.slice(1);
+      const w = p.toLowerCase();
+      return i > 0 && minusculas.has(w) ? w : w.replace(/(^|[-'’])(\p{L})/gu, (_, antes: string, letra: string) => antes + letra.toLocaleUpperCase('es-AR'));
+    })
     .join(' ');
 }
 
@@ -102,7 +100,9 @@ export const TIPOS_CURSO: Record<TipoCurso, { nombre: string; articulo: string }
   formacion: { nombre: 'Formación', articulo: 'la formación' },
   masterclass: { nombre: 'Masterclass', articulo: 'la masterclass' },
   congreso: { nombre: 'Congreso', articulo: 'el congreso' },
-  workshop: { nombre: 'Workshop', articulo: 'el workshop' },
+  jornada: { nombre: 'Jornada', articulo: 'la jornada' },
+  // La clave sigue siendo "workshop" en la base; se muestra en castellano.
+  workshop: { nombre: 'Taller', articulo: 'el taller' },
 };
 
 // 2 → "2 horas", 2.5 → "2,5 horas", 1 → "1 hora"
@@ -159,9 +159,12 @@ export function linkContacto(tipo: 'whatsapp' | 'instagram' | null, valor: strin
 }
 
 // ["a", "b", "c"] → "a, b y c"
+// Antes de "i" o "hi" (sin diptongo: "hielo" sigue con "y") va "e": "Asociación Demo e Instituto Demo".
 export function listaConY(items: string[]): string {
   if (items.length <= 1) return items[0] ?? '';
-  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+  const ultimo = items[items.length - 1];
+  const y = /^h?[ií](?![aeoáéó])/i.test(ultimo) ? 'e' : 'y';
+  return `${items.slice(0, -1).join(', ')} ${y} ${ultimo}`;
 }
 
 // (1, 'certificado', 'certificados') → "1 certificado"; (3, ...) → "3 certificados"

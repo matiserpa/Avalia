@@ -7,6 +7,7 @@
 // - Si no: el mail trae el link para activar su pasaporte.
 
 import 'server-only';
+import { createHash } from 'node:crypto';
 import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { certificados, egresadas, instituciones, usuarios } from '@/db/schema';
@@ -32,12 +33,28 @@ export async function pendientesDeEmitir(institucionId: string, cursoId: string)
     .orderBy(egresadas.apellido, egresadas.nombre);
 }
 
+// Huella de la lista que se mostró para revisar: si cambia antes de emitir (alguien agregó o
+// corrigió una egresada en otra pestaña), no se emite nada que no se haya revisado.
+export function firmaDeLista(lista: { id: string; nombre: string; apellido: string; email: string }[]): string {
+  const ordenada = [...lista].sort((a, b) => a.id.localeCompare(b.id)).map((e) => [e.id, e.nombre, e.apellido, e.email]);
+  return createHash('sha256').update(JSON.stringify(ordenada)).digest('hex').slice(0, 24);
+}
+
 async function codigoLibre(): Promise<string> {
   for (;;) {
     const codigo = generarCodigo();
     const [ya] = await db.select({ id: certificados.id }).from(certificados).where(eq(certificados.codigo, codigo)).limit(1);
     if (!ya) return codigo;
   }
+}
+
+// El error de Postgres por el índice único "un certificado válido por egresada". Drizzle lo
+// envuelve: el original queda en cause.
+function esDuplicada(error: unknown): boolean {
+  for (let e = error as { message?: string; cause?: unknown } | undefined; e; e = e.cause as typeof e) {
+    if (String(e.message ?? '').includes('certificados_egresada_valido')) return true;
+  }
+  return false;
 }
 
 async function cuentaActiva(email: string): Promise<string | null> {
@@ -49,13 +66,15 @@ async function cuentaActiva(email: string): Promise<string | null> {
   return u?.id ?? null;
 }
 
-export type ResultadoEmision = { emitidos: number; mailsConError: number };
+export type ResultadoEmision = { emitidos: number; mailsConError: number; cambio?: boolean };
 
-export async function emitirCurso(institucionId: string, cursoId: string): Promise<ResultadoEmision> {
+// firma: la de la lista que la institución revisó (ver firmaDeLista). Si no coincide, no emite.
+export async function emitirCurso(institucionId: string, cursoId: string, firma?: string): Promise<ResultadoEmision> {
   const curso = await obtenerCurso(institucionId, cursoId);
   if (!curso) return { emitidos: 0, mailsConError: 0 };
   const [inst] = await db.select({ nombre: instituciones.nombre }).from(instituciones).where(eq(instituciones.id, institucionId));
   const pendientes = await pendientesDeEmitir(institucionId, cursoId);
+  if (firma !== undefined && firma !== firmaDeLista(pendientes)) return { emitidos: 0, mailsConError: 0, cambio: true };
 
   const emitidos: { certificadoId: string; correo: Correo }[] = [];
   for (const e of pendientes) {
@@ -77,8 +96,10 @@ export async function emitirCurso(institucionId: string, cursoId: string): Promi
         })
         .returning({ id: certificados.id });
       certificadoId = c.id;
-    } catch {
+    } catch (error) {
       // Otro pedido la emitió al mismo tiempo (hay un índice que impide dos válidos): se saltea.
+      // Cualquier otro error se informa: no se puede dar por emitido lo que no se emitió.
+      if (!esDuplicada(error)) throw error;
       continue;
     }
     const enlace = usuarioId ? `${urlBase()}/ingresar` : await crearEnlaceActivacion(certificadoId);
@@ -135,6 +156,7 @@ export async function reenviarMail(institucionId: string, certificadoId: string)
       curso: curso.nombre,
       enlace,
       yaTieneCuenta: Boolean(c.usuarioId),
+      reenvio: true,
       certificadoId: c.id,
     }),
   ]);

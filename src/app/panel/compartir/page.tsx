@@ -5,6 +5,7 @@ import { Aviso } from '@/components/ui/Aviso';
 import { BotonEnviar } from '@/components/ui/BotonEnviar';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import { MARCA } from '@/config/marca';
+import { certificadosVisibles } from '@/features/publico/perfil';
 import { requerirProfesional } from '@/lib/auth/guardas';
 import { urlBase } from '@/lib/config';
 import { qrSvg } from '@/lib/qr';
@@ -45,6 +46,8 @@ export default async function Compartir({ searchParams }: PageProps<'/panel/comp
   const linkCorto = base.replace(/^https?:\/\//, '');
   const svg = await qrSvg(`${base}?c=qr`);
   const nombre = nombreCompleto(p);
+  // "Verificada" sólo si el perfil muestra al menos un certificado.
+  const conSello = (await certificadosVisibles(s.usuario.id)).length > 0;
 
   return (
     <>
@@ -71,7 +74,7 @@ export default async function Compartir({ searchParams }: PageProps<'/panel/comp
         >
           {/* La tarjeta es lo único que se imprime. */}
           <div className="tarjeta-qr mx-auto max-w-sm rounded-tarjeta border-2 border-tinta bg-white p-6 text-center">
-            <p className="text-[1.1875rem] font-bold">Mi formación está verificada</p>
+            <p className="text-[1.1875rem] font-bold">{conSello ? 'Mi formación está verificada' : 'Mirá mi perfil profesional'}</p>
             <div className="mx-auto mt-4 w-56 [&_svg]:h-auto [&_svg]:w-full" role="img" aria-label={`Código QR que lleva a ${linkCorto}`}>
               <div aria-hidden="true" dangerouslySetInnerHTML={{ __html: svg }} />
             </div>
@@ -100,7 +103,7 @@ export default async function Compartir({ searchParams }: PageProps<'/panel/comp
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/panel/compartir/historia"
-              alt={`Vista previa de la imagen para historias: ${nombre}, formación verificada`}
+              alt={`Vista previa de la imagen para historias: ${nombre}${conSello ? ', formación verificada' : ''}`}
               width={1080}
               height={1920}
               className="h-auto w-48 rounded-2xl border border-borde-suave shadow-tarjeta"

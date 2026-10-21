@@ -53,7 +53,7 @@ export default function Privacidad() {
           <li>Para emitir tus certificados y que cualquiera pueda verificarlos con su código o su QR.</li>
           <li>Para mostrar tu perfil, sólo si vos decidís publicarlo.</li>
           <li>Para mandarte los mails necesarios: el código para ingresar y los avisos de certificados nuevos.</li>
-          <li>Para medir el piloto con números generales (cuántos perfiles se activan, se comparten y se verifican).</li>
+          <li>Para medir el piloto con números generales (cuántos pasaportes se activan, cuántos perfiles se comparten y cuántos certificados se verifican).</li>
         </ul>
         <p>No vendemos tus datos ni los usamos para publicidad.</p>
       </Seccion>
@@ -66,7 +66,7 @@ export default function Privacidad() {
         </p>
         <p>
           La verificación de un certificado muestra el nombre de la titular, el curso, la institución y las fechas a quien
-          tenga el código o el QR, aunque todavía no hayas activado tu cuenta. Es la función del certificado.
+          tenga el código o el QR, aunque todavía no hayas activado tu pasaporte. Es la función del certificado.
         </p>
         <p>
           <strong>Nunca mostramos tu mail.</strong> Los perfiles y las verificaciones no aparecen en buscadores: se

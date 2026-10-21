@@ -8,16 +8,23 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { imagenes } from '@/db/schema';
 
-export const MAX_BYTES_SUBIDA = 8 * 1024 * 1024;
-const TIPOS_ACEPTADOS = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/avif', 'image/gif', 'image/svg+xml'];
+// El hosting (Vercel) rechaza envíos de más de 4,5 MB: el navegador achica las fotos antes de
+// subirlas (src/lib/achicar-imagen.ts) y acá se acepta hasta 4 MB.
+export const MAX_BYTES_SUBIDA = 4 * 1024 * 1024;
+const TIPOS_ACEPTADOS = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/avif', 'image/gif'];
 
 export type ResultadoImagen = { ok: true; id: string } | { ok: false; error: string };
 
-// opciones.fondo: para logos con transparencia conviene dejarla; para fotos no importa.
-export async function guardarImagen(archivo: File, opciones: { lado?: number; recortarCuadrada?: boolean } = {}): Promise<ResultadoImagen> {
+// opciones.permitirSvg: sólo para logos (las instituciones suelen tenerlo así). Se convierte a
+// WebP como el resto: nunca se sirve un SVG subido.
+export async function guardarImagen(
+  archivo: File,
+  opciones: { lado?: number; recortarCuadrada?: boolean; permitirSvg?: boolean } = {},
+): Promise<ResultadoImagen> {
   if (!archivo || archivo.size === 0) return { ok: false, error: 'Elegí una imagen.' };
-  if (archivo.size > MAX_BYTES_SUBIDA) return { ok: false, error: 'La imagen pesa más de 8 MB. Probá con una más liviana.' };
-  if (archivo.type && !TIPOS_ACEPTADOS.includes(archivo.type)) {
+  if (archivo.size > MAX_BYTES_SUBIDA) return { ok: false, error: 'La imagen pesa más de 4 MB. Probá con una más liviana.' };
+  const aceptados = opciones.permitirSvg ? [...TIPOS_ACEPTADOS, 'image/svg+xml'] : TIPOS_ACEPTADOS;
+  if (archivo.type && !aceptados.includes(archivo.type)) {
     return { ok: false, error: 'Ese archivo no es una imagen que podamos usar. Probá con JPG o PNG.' };
   }
   const lado = opciones.lado ?? 512;

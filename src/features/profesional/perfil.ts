@@ -4,6 +4,7 @@ import 'server-only';
 import { desc, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { certificados, perfiles } from '@/db/schema';
+import { slugLibre } from '@/lib/auth/activacion';
 import type { SesionActual } from '@/lib/auth/sesion';
 import { registrarEvento } from '@/lib/eventos';
 import { borrarImagen, guardarImagen } from '@/lib/imagenes';
@@ -64,8 +65,14 @@ export async function guardarPerfil(
   campos: CamposPerfil,
   foto: { archivo: File | null; quitar: boolean },
 ): Promise<{ ok: true } | { ok: false; errores: ErroresPerfil }> {
-  const [actual] = await db.select({ fotoId: perfiles.fotoId }).from(perfiles).where(eq(perfiles.usuarioId, usuarioId)).limit(1);
+  const [actual] = await db
+    .select({ fotoId: perfiles.fotoId, slug: perfiles.slug, publicadoEn: perfiles.publicadoEn })
+    .from(perfiles)
+    .where(eq(perfiles.usuarioId, usuarioId))
+    .limit(1);
   if (!actual) return { ok: false, errores: { nombre: 'No encontramos tu perfil. Volvé a ingresar.' } };
+  // Mientras nunca se publicó, el link sigue al nombre. Después ya se compartió y no cambia.
+  const slug = actual.publicadoEn ? actual.slug : await slugLibre(`${campos.nombre} ${campos.apellido}`, usuarioId);
 
   let fotoId = actual.fotoId;
   if (foto.archivo && foto.archivo.size > 0) {
@@ -79,6 +86,7 @@ export async function guardarPerfil(
   await db
     .update(perfiles)
     .set({
+      slug,
       nombre: campos.nombre,
       apellido: campos.apellido,
       profesion: campos.profesion || null,
@@ -140,15 +148,16 @@ export async function procesarFormularioPerfil(
   usuarioId: string,
   fd: FormData,
   intento: number,
-): Promise<{ intento: number; ok?: boolean; errores?: ErroresPerfil; valores: CamposPerfil }> {
-  const { campos, errores } = leerFormularioPerfil(fd);
-  if (Object.keys(errores).length > 0) return { intento, errores, valores: campos };
+): Promise<{ intento: number; ok?: boolean; errores?: ErroresPerfil; valores: CamposPerfil; habiaArchivo?: boolean }> {
   const archivo = fd.get('foto');
+  const habiaArchivo = archivo instanceof File && archivo.size > 0;
+  const { campos, errores } = leerFormularioPerfil(fd);
+  if (Object.keys(errores).length > 0) return { intento, errores, valores: campos, habiaArchivo };
   const r = await guardarPerfil(usuarioId, campos, {
     archivo: archivo instanceof File ? archivo : null,
     quitar: fd.get('quitarFoto') === 'si',
   });
-  if (!r.ok) return { intento, errores: r.errores, valores: campos };
+  if (!r.ok) return { intento, errores: r.errores, valores: campos, habiaArchivo };
   return { intento, ok: true, valores: campos };
 }
 

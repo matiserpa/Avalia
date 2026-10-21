@@ -14,13 +14,18 @@ import { cantidad, listaConY, nombreCompleto } from '@/lib/texto';
 export async function generateMetadata({ params }: PageProps<'/p/[slug]'>): Promise<Metadata> {
   const { slug } = await params;
   const datos = await perfilPorSlug(slug);
-  if (!datos?.perfil.publico) return { title: 'Perfil no disponible' };
+  if (!datos?.perfil.publico) {
+    // La dueña ve su propio perfil privado: a ella sí se le dice cuál es.
+    const s = datos ? await sesionActual() : null;
+    if (datos && s?.usuario.id === datos.perfil.usuarioId) return { title: `${nombreCompleto(datos.perfil)} (privado)` };
+    return { title: 'Perfil no disponible' };
+  }
   const { perfil, certificados } = datos;
   const title = [nombreCompleto(perfil), perfil.profesion].filter(Boolean).join(' · ');
   const description =
     certificados.length > 0
       ? `${cantidad(certificados.length, 'certificado verificado', 'certificados verificados')}, emitidos por ${listaConY(institucionesDe(certificados))}.`
-      : 'Perfil profesional con formación verificada.';
+      : `Perfil profesional de ${nombreCompleto(perfil)}.`;
   return { title, description, openGraph: { title, description, type: 'profile' } };
 }
 

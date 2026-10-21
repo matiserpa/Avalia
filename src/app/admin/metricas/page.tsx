@@ -12,10 +12,11 @@ import { cantidad } from '@/lib/texto';
 
 export const metadata: Metadata = { title: 'Métricas del piloto' };
 
+// "frase" va dentro de una oración: "En las últimas 8 semanas."
 const PERIODOS = [
-  { valor: '4', texto: 'Últimas 4 semanas' },
-  { valor: '8', texto: 'Últimas 8 semanas' },
-  { valor: '0', texto: 'Todo el piloto' },
+  { valor: '4', texto: 'Últimas 4 semanas', frase: 'las últimas 4 semanas' },
+  { valor: '8', texto: 'Últimas 8 semanas', frase: 'las últimas 8 semanas' },
+  { valor: '0', texto: 'Todo el piloto', frase: 'todo el piloto' },
 ];
 
 export default async function Metricas({ searchParams }: PageProps<'/admin/metricas'>) {
@@ -25,14 +26,15 @@ export default async function Metricas({ searchParams }: PageProps<'/admin/metri
   const institucionId = typeof sp.institucion === 'string' && instituciones.some((i) => i.id === sp.institucion) ? sp.institucion : null;
   const semanas = typeof sp.periodo === 'string' && ['4', '8', '0'].includes(sp.periodo) ? Number(sp.periodo) : 8;
   const m = await calcularMetricas({ institucionId, semanas });
-  const periodo = PERIODOS.find((p) => p.valor === String(semanas))!.texto.toLowerCase();
+  const elegido = PERIODOS.find((p) => p.valor === String(semanas))!;
+  const periodo = elegido.frase;
   const porCanal = (lista: { clave: string; valor: number }[]) => lista.map((c) => ({ etiqueta: NOMBRE_CANAL[c.clave as Canal] ?? c.clave, valor: c.valor }));
 
   return (
     <>
       <TituloPagina
         titulo="Métricas del piloto"
-        bajada="¿Las profesionales activan y comparten su perfil? ¿Los pacientes verifican? Sin datos de quién visita: sólo cuántos y por qué canal."
+        bajada="¿Las profesionales activan su pasaporte y comparten su perfil? ¿Los pacientes verifican? Sin datos de quién visita: sólo cuántos y por qué canal."
       />
 
       {/* Filtros: una fila arriba de todo lo que afectan. */}
@@ -70,7 +72,7 @@ export default async function Metricas({ searchParams }: PageProps<'/admin/metri
             detalle={`${numero(m.activadas)} de ${cantidad(m.personas, 'persona con certificado', 'personas con certificado')}`}
           />
           <NumeroClave etiqueta="Perfiles públicos" valor={numero(m.publicas)} detalle={`De ${cantidad(m.activadas, 'pasaporte activo', 'pasaportes activos')}`} />
-          <NumeroClave etiqueta="Compartieron su perfil" valor={numero(m.compartieron)} detalle={`Perfiles distintos, ${periodo}`} />
+          <NumeroClave etiqueta="Compartieron su perfil" valor={numero(m.compartieron)} detalle={`Perfiles distintos, en ${periodo}`} />
         </div>
       </section>
 
@@ -122,7 +124,7 @@ export default async function Metricas({ searchParams }: PageProps<'/admin/metri
                 <th scope="col" className="px-4 py-3 text-right font-semibold">Certificados</th>
                 <th scope="col" className="px-4 py-3 text-right font-semibold">Personas</th>
                 <th scope="col" className="px-4 py-3 text-right font-semibold">Activaron</th>
-                <th scope="col" className="px-4 py-3 text-right font-semibold">Verificaciones ({periodo})</th>
+                <th scope="col" className="px-4 py-3 text-right font-semibold">Verificaciones ({elegido.texto.toLowerCase()})</th>
               </tr>
             </thead>
             <tbody className="numeros-tabulares divide-y divide-borde-suave">

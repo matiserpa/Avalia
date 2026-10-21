@@ -65,11 +65,12 @@ function semanasEntre(desde: string, hasta: string): string[] {
   const out: string[] = [];
   const d = new Date(`${desde}T00:00:00Z`);
   const fin = new Date(`${hasta}T00:00:00Z`);
-  while (d <= fin && out.length < 60) {
+  while (d <= fin) {
     out.push(d.toISOString().slice(0, 10));
     d.setUTCDate(d.getUTCDate() + 7);
   }
-  return out;
+  // Como mucho, las últimas 60 semanas (las más nuevas).
+  return out.slice(-60);
 }
 
 function contarPor<T>(lista: T[], clave: (x: T) => string | null): Conteo[] {
@@ -96,7 +97,10 @@ export async function calcularMetricas(f: Filtro, ahora = new Date()): Promise<M
     .select({ email: certificados.email, usuarioId: certificados.usuarioId, institucionId: certificados.institucionId })
     .from(certificados)
     .where(and(eq(certificados.estado, 'valido'), f.institucionId ? eq(certificados.institucionId, f.institucionId) : undefined));
-  const personas = new Set(certs.map((c) => c.email));
+  // Una persona es una cuenta (aunque junte certificados de dos mails) o, si todavía no activó,
+  // un mail. Así "activadas" y "personas" cuentan lo mismo y la tasa no se distorsiona.
+  const persona = (c: { email: string; usuarioId: string | null }) => c.usuarioId ?? `mail:${c.email}`;
+  const personas = new Set(certs.map(persona));
   const usuariosConCert = [...new Set(certs.map((c) => c.usuarioId).filter((x): x is string => Boolean(x)))];
 
   const activas = usuariosConCert.length
@@ -144,7 +148,7 @@ export async function calcularMetricas(f: Filtro, ahora = new Date()): Promise<M
         id: i.id,
         nombre: i.nombre,
         certificados: suyos.length,
-        personas: new Set(suyos.map((c) => c.email)).size,
+        personas: new Set(suyos.map(persona)).size,
         activadas: new Set(suyos.map((c) => c.usuarioId).filter(Boolean)).size,
         verificaciones: ev.filter((e) => e.tipo === 'verificacion' && e.institucionId === i.id).length,
       };

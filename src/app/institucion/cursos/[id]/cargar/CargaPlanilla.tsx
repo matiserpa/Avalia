@@ -7,6 +7,7 @@ import { Aviso } from '@/components/ui/Aviso';
 import { Boton } from '@/components/ui/Boton';
 import { BotonEnviar } from '@/components/ui/BotonEnviar';
 import { AreaTexto } from '@/components/ui/Campo';
+import { ElegirArchivo } from '@/components/ui/ElegirArchivo';
 import { Icono } from '@/components/ui/Icono';
 import { cantidad } from '@/lib/texto';
 import { confirmarCarga, revisarPlanilla, type EstadoPlanilla } from '../../../acciones';
@@ -32,7 +33,9 @@ export function CargaPlanilla({ cursoId }: { cursoId: string }) {
           ))}
           <Aviso tono={conError > 0 ? 'atencion' : 'exito'} titulo={`${cantidad(validas.length, 'egresada lista', 'egresadas listas')} para cargar`}>
             {conError > 0
-              ? `${cantidad(conError, 'fila tiene', 'filas tienen')} algo para revisar y no se va${conError === 1 ? '' : 'n'} a cargar. Corregilas en la planilla y volvé a pegarlas, o agregalas de a una.`
+              ? conError === 1
+                ? '1 fila tiene algo para revisar y no se va a cargar. Corregila en la planilla y volvé a pegarla, o agregala a mano.'
+                : `${conError} filas tienen algo para revisar y no se van a cargar. Corregilas en la planilla y volvé a pegarlas, o agregalas a mano.`
               : 'Revisá que los nombres estén bien: así van a figurar en los certificados.'}
           </Aviso>
         </div>
@@ -101,6 +104,7 @@ export function CargaPlanilla({ cursoId }: { cursoId: string }) {
   }
 
   const error = estado.paso === 'pegar' ? estado.error : undefined;
+  const errorArchivo = estado.paso === 'pegar' ? estado.errorArchivo : undefined;
   const texto = estado.paso === 'pegar' ? estado.texto : undefined;
   return (
     <form action={(fd) => { setVolver(false); return enviar(fd); }} className="space-y-6" noValidate>
@@ -115,18 +119,16 @@ export function CargaPlanilla({ cursoId }: { cursoId: string }) {
         className="[&_textarea]:min-h-56 [&_textarea]:font-mono [&_textarea]:text-[0.9375rem]"
         ayuda="Seleccioná en Excel o Google Sheets las columnas Nombre, Apellido y Mail, con el encabezado, copialas y pegalas acá. Si la planilla tiene DNI, no pasa nada: lo ignoramos."
       />
-      <div>
-        <label htmlFor="campo-archivo" className="mb-1.5 block font-semibold">
-          O subí un archivo CSV <span className="font-normal text-tinta-suave">(opcional)</span>
-        </label>
-        <input
-          id="campo-archivo"
-          name="archivo"
-          type="file"
-          accept=".csv,text/csv"
-          className="block w-full text-[0.9375rem] file:mr-4 file:min-h-12 file:cursor-pointer file:rounded-full file:border file:border-borde file:bg-papel file:px-5 file:font-semibold file:text-tinta hover:file:bg-crema-claro"
-        />
-      </div>
+      <ElegirArchivo
+        etiqueta="O subí la planilla guardada como CSV"
+        opcional
+        textoBoton="Elegir archivo CSV"
+        name="archivo"
+        icono="planilla"
+        accept=".csv,text/csv"
+        ayuda="En Excel: Archivo › Guardar como › CSV. En Google Sheets: Archivo › Descargar › CSV."
+        error={errorArchivo}
+      />
       <BotonEnviar tamano="lg" textoEnviando="Leyendo la planilla…">
         Revisar
       </BotonEnviar>

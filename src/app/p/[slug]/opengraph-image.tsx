@@ -11,7 +11,8 @@ import { perfilPorSlug } from '@/features/publico/perfil';
 import { COLORES as C, fotoComoDataUrl, fuentes } from '@/lib/imagenes-generadas';
 import { cantidad, iniciales, nombreCompleto } from '@/lib/texto';
 
-export const alt = 'Perfil profesional con formación verificada';
+// El mismo texto para todos: si dependiera del perfil, delataría cuáles son privados.
+export const alt = 'Vista previa del perfil profesional';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -58,7 +59,9 @@ export default async function Imagen({ params }: { params: Promise<{ slug: strin
             <IsotipoPlano tamano={44} color={C.tierra} contraste={C.marfil} />
             <span style={{ fontSize: 30, fontWeight: 800, color: C.tinta }}>{MARCA.nombre}</span>
           </div>
-          <span style={{ fontSize: 28, color: C.tintaSuave }}>Formación verificada por las instituciones</span>
+          <span style={{ fontSize: 28, color: C.tintaSuave }}>
+            {certificados.length > 0 ? 'Formación verificada por las instituciones' : 'Perfil profesional'}
+          </span>
         </div>
       </div>
     ),

@@ -85,7 +85,7 @@ function LinkQueNoSirve({ estado }: { estado: Exclude<EstadoEnlace['estado'], 'v
   const textos = {
     usado: {
       titulo: 'Este link ya se usó',
-      cuerpo: 'Tu pasaporte ya está activo. Para entrar, te mandamos un código a tu mail.',
+      cuerpo: 'Tu pasaporte ya está activo. Para entrar, ingresá con tu mail y te mandamos un código.',
     },
     vencido: {
       titulo: 'Este link venció',

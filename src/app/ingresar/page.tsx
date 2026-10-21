@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { PaginaPublica } from '@/components/layout/EncabezadoPublico';
 import { Aviso } from '@/components/ui/Aviso';
+import { MARCA } from '@/config/marca';
 import { destinoInicial, sesionActual } from '@/lib/auth/sesion';
 import { modoDemo } from '@/lib/config';
 import { FormularioIngreso } from './FormularioIngreso';
@@ -23,7 +24,16 @@ export default async function PaginaIngresar({ searchParams }: PageProps<'/ingre
 
         {sp.motivo === 'sin-permiso' && (
           <Aviso tono="atencion" className="mt-6">
-            Esa sección no está disponible para tu cuenta. Si creés que es un error, escribinos.
+            Esa sección no está disponible para tu cuenta. Si creés que es un error, escribinos a{' '}
+            <a href={`mailto:${MARCA.emailContacto}`} className="font-semibold underline underline-offset-4">
+              {MARCA.emailContacto}
+            </a>
+            .
+          </Aviso>
+        )}
+        {sp.motivo === 'sesion' && (
+          <Aviso tono="info" className="mt-6">
+            Tu sesión se cerró. Ingresá de nuevo con tu mail y te mandamos un código.
           </Aviso>
         )}
         {modoDemo() && (

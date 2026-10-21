@@ -1,8 +1,14 @@
 // Lectura centralizada de variables de entorno. Ver .env.example para la lista completa.
 
+// Va en los QR, los mails y los links: en producción tiene que estar definida (si no, todo
+// apuntaría a localhost y los mails que salgan no se pueden corregir). Durante la compilación no se
+// exige: ahí no se arma ningún link.
 export function urlBase(): string {
-  const url = process.env.APP_URL || 'http://localhost:3000';
-  return url.replace(/\/+$/, '');
+  const url = process.env.APP_URL;
+  if (!url && process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
+    throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://sella.com.ar');
+  }
+  return (url || 'http://localhost:3000').replace(/\/+$/, '');
 }
 
 // Modo demo: bandeja de mails en pantalla, accesos rápidos y botón para reiniciar los datos.
@@ -13,8 +19,14 @@ export function modoDemo(): boolean {
 
 // 'bandeja': los mails no salen, quedan en la base y se ven en /demo/bandeja (demo y desarrollo).
 // 'resend': salen de verdad por Resend.
+// En el piloto (producción sin modo demo) sólo vale 'resend': la bandeja guarda el cuerpo de los
+// mails, con códigos y links de ingreso, y una variable mal puesta no puede activarla sin avisar.
 export function modoCorreo(): 'bandeja' | 'resend' {
-  return process.env.MAIL_MODE === 'resend' ? 'resend' : 'bandeja';
+  if (process.env.MAIL_MODE === 'resend') return 'resend';
+  if (process.env.NODE_ENV === 'production' && !modoDemo()) {
+    throw new Error('Falta MAIL_MODE=resend. En el piloto los mails tienen que salir por Resend.');
+  }
+  return 'bandeja';
 }
 
 export function adminEmails(): string[] {

@@ -27,22 +27,23 @@ export function MarcoPanel({
   const conNav = items.length > 1;
   return (
     <>
-      <header className="no-imprimir sticky top-0 z-30 border-b border-borde-suave bg-marfil/95 backdrop-blur">
+      <header data-encabezado-fijo className="no-imprimir sticky top-0 z-30 border-b border-borde-suave bg-marfil/95 backdrop-blur">
         <div className={`mx-auto flex ${max} items-center justify-between gap-3 px-4 py-3 sm:px-6`}>
-          <Link href={inicio} className="flex min-w-0 items-center gap-3 rounded-lg" aria-label="Ir al inicio del panel">
+          <Link href={inicio} className="flex min-w-0 items-center gap-3 rounded-lg">
             <Logo compacto />
             {rotulo && (
               <span className="hidden truncate border-l border-borde-suave pl-3 text-[0.9375rem] font-medium text-tinta-suave md:inline">
                 {rotulo}
               </span>
             )}
+            <span className="sr-only">, ir al inicio del panel</span>
           </Link>
           <div className="flex items-center gap-2">
             {conNav && <NavSuperior items={items} />}
             <form action={salir}>
               <button
                 type="submit"
-                className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 font-semibold text-tinta-suave hover:bg-crema-claro hover:text-tinta"
+                className="inline-flex min-h-12 items-center gap-2 rounded-full px-3 font-semibold text-tinta-suave hover:bg-crema-claro hover:text-tinta"
               >
                 <Icono nombre="salir" />
                 <span>Salir</span>
@@ -79,7 +80,7 @@ export function TituloPagina({
       {volver && (
         <Link
           href={volver.href}
-          className="mb-3 inline-flex min-h-10 items-center gap-1.5 rounded-full font-semibold text-tinta-suave hover:text-tinta"
+          className="mb-3 inline-flex min-h-12 items-center gap-1.5 rounded-full font-semibold text-tinta-suave hover:text-tinta"
         >
           <Icono nombre="flecha-izq" />
           {volver.texto}

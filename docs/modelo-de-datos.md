@@ -36,7 +36,7 @@ Solo para profesionales, uno por usuario.
 - **`publico`**: arranca en `false`. `publicado_en` registra cuándo lo publicó por primera vez.
 
 ### `cursos`
-- **`tipo`:** `formacion`, `masterclass`, `congreso` o `workshop`.
+- **`tipo`:** `formacion`, `masterclass`, `congreso`, `jornada` o `workshop` (se muestra como "Taller").
 - **`carga_horaria`:** en horas, admite decimales.
 - **`fecha`:** la de realización o finalización. Es la que figura en el certificado.
 - **`docente`:** docente o disertante.

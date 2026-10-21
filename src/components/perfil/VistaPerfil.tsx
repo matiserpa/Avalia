@@ -28,7 +28,7 @@ export function VistaPerfil({ datos, nivel = 1 }: { datos: DatosPerfil; nivel?: 
 
   return (
     <div className="lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:items-start lg:gap-10">
-      <aside className="lg:sticky lg:top-24">
+      <div className="lg:sticky lg:top-24">
         <div className="rounded-tarjeta border border-borde-suave bg-papel px-5 py-7 text-center shadow-tarjeta sm:px-7">
           <Avatar
             fotoUrl={urlImagen(perfil.fotoId)}
@@ -69,7 +69,7 @@ export function VistaPerfil({ datos, nivel = 1 }: { datos: DatosPerfil; nivel?: 
             )}
           </div>
         </div>
-      </aside>
+      </div>
 
       <section aria-labelledby="formacion" className="mt-10 lg:mt-0">
         <H2 id="formacion" className="text-[1.5rem] font-bold tracking-tight">
@@ -78,7 +78,7 @@ export function VistaPerfil({ datos, nivel = 1 }: { datos: DatosPerfil; nivel?: 
         <p className="mt-1 text-tinta-suave">Cada certificado lo emitió la institución. Tocá Verificar para comprobarlo.</p>
 
         {grupos.length === 0 ? (
-          <EstadoVacio icono="libro" titulo="Todavía no hay formación para mostrar" className="mt-6">
+          <EstadoVacio icono="libro" titulo="Todavía no hay formación para mostrar" className="mt-6" nivel={H3}>
             Cuando una institución le emita un certificado, va a aparecer acá.
           </EstadoVacio>
         ) : (

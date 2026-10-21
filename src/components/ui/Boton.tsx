@@ -6,8 +6,9 @@ import { Icono, type NombreIcono } from './Icono';
 type Variante = 'primario' | 'secundario' | 'fantasma' | 'peligro' | 'verde';
 type Tamano = 'md' | 'lg' | 'sm';
 
+// py-2 y text-center: si el texto ocupa dos renglones, queda centrado y con aire.
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors select-none disabled:opacity-55 disabled:cursor-not-allowed aria-disabled:opacity-55 aria-disabled:pointer-events-none';
+  'inline-flex items-center justify-center gap-2 rounded-full py-2 text-center leading-snug font-semibold transition-colors select-none disabled:opacity-55 disabled:cursor-not-allowed aria-disabled:opacity-55 aria-disabled:pointer-events-none';
 const VARIANTES: Record<Variante, string> = {
   primario: 'bg-tinta text-marfil hover:bg-[#2a2f2c] active:bg-black',
   secundario: 'bg-papel text-tinta border border-borde hover:bg-crema-claro',
@@ -16,7 +17,7 @@ const VARIANTES: Record<Variante, string> = {
   verde: 'bg-verde text-white hover:bg-verde-oscuro',
 };
 const TAMANOS: Record<Tamano, string> = {
-  sm: 'min-h-10 px-4 text-[0.9375rem]',
+  sm: 'min-h-12 px-4 text-[0.9375rem]',
   md: 'min-h-12 px-5 text-base',
   lg: 'min-h-14 px-7 text-[1.0625rem]',
 };
@@ -54,7 +55,7 @@ export function Boton({
   className,
   children,
   ...resto
-}: Comunes & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+}: Comunes & React.ComponentProps<'button'>) {
   return (
     <button className={clasesBoton({ variante, tamano, anchoCompleto, className })} {...resto}>
       {icono && <Icono nombre={icono} />}

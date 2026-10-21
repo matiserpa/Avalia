@@ -8,11 +8,17 @@ import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import { Etiqueta } from '@/components/ui/Sello';
 import { egresadasDelCurso, obtenerCurso, type EgresadaConEstado } from '@/features/institucion/cursos';
 import { requerirInstitucion } from '@/lib/auth/guardas';
+import { sesionActual } from '@/lib/auth/sesion';
 import { formatearCodigo } from '@/lib/certificados/codigo';
 import { cantidad, fechaCorta, fechaLarga, horas, TIPOS_CURSO } from '@/lib/texto';
 import { AccionesCertificado, AgregarEgresada, CorregirEgresada } from './Acciones';
 
-export const metadata: Metadata = { title: 'Curso' };
+// El nombre del curso en la pestaña, para distinguir varias abiertas. Sólo para su institución.
+export async function generateMetadata({ params }: PageProps<'/institucion/cursos/[id]'>): Promise<Metadata> {
+  const [{ id }, s] = await Promise.all([params, sesionActual()]);
+  const curso = s?.usuario.institucionId ? await obtenerCurso(s.usuario.institucionId, id) : null;
+  return { title: curso?.nombre ?? 'Curso' };
+}
 
 export default async function DetalleCurso({ params, searchParams }: PageProps<'/institucion/cursos/[id]'>) {
   const s = await requerirInstitucion();
@@ -70,6 +76,7 @@ export default async function DetalleCurso({ params, searchParams }: PageProps<'
             icono="planilla"
             titulo="Todavía no cargaste egresadas"
             className="mt-4"
+            nivel="h3"
             accion={
               <BotonLink href={`/institucion/cursos/${id}/cargar`} icono="planilla">
                 Cargar planilla
@@ -113,14 +120,17 @@ function AvisosDeRegreso({ sp, conError }: { sp: Record<string, string | string[
       {sp.emitidos !== undefined && (
         <Aviso tono={n('errores') > 0 ? 'atencion' : 'exito'} titulo={`Emitimos ${cantidad(n('emitidos'), 'certificado', 'certificados')}`}>
           {n('errores') > 0
-            ? `${cantidad(n('errores'), 'mail no se pudo mandar', 'mails no se pudieron mandar')}: revisá esas direcciones o copiá el link para mandarlo por WhatsApp.`
+            ? n('errores') === 1
+              ? '1 mail no se pudo mandar: revisá la dirección o creá un link para mandarlo por WhatsApp.'
+              : `${n('errores')} mails no se pudieron mandar: revisá esas direcciones o creá un link para mandarlo por WhatsApp.`
             : 'Le mandamos un mail a cada egresada para que active su pasaporte.'}
         </Aviso>
       )}
       {sp.emitidos === undefined && conError > 0 && (
         <Aviso tono="atencion">
-          A {cantidad(conError, 'egresada', 'egresadas')} no le pudimos mandar el mail. Revisá la dirección o copiá el link para mandarlo por
-          WhatsApp.
+          {conError === 1
+            ? 'A 1 egresada no le pudimos mandar el mail. Revisá la dirección o creá un link para mandarlo por WhatsApp.'
+            : `A ${conError} egresadas no les pudimos mandar el mail. Revisá sus direcciones o creá un link para mandarlo por WhatsApp.`}
         </Aviso>
       )}
     </div>
@@ -130,7 +140,7 @@ function AvisosDeRegreso({ sp, conError }: { sp: Record<string, string | string[
 const ESTADOS: Record<EgresadaConEstado['estado'], { texto: string; tono: 'neutro' | 'tierra' | 'error' | 'tinta'; icono: 'reloj' | 'mail' | 'alerta' | 'check' }> = {
   sin_emitir: { texto: 'Sin certificado', tono: 'neutro', icono: 'reloj' },
   emitido: { texto: 'Mail enviado, no activó', tono: 'tierra', icono: 'mail' },
-  error_mail: { texto: 'No le llegó el mail', tono: 'error', icono: 'alerta' },
+  error_mail: { texto: 'No pudimos mandar el mail', tono: 'error', icono: 'alerta' },
   activado: { texto: 'Activó su pasaporte', tono: 'tinta', icono: 'check' },
 };
 

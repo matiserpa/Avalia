@@ -5,7 +5,8 @@
 // que además registra el consentimiento. Después de usarse, el link deja de servir para entrar.
 
 import 'server-only';
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { randomBytes } from 'node:crypto';
+import { and, desc, eq, gt, inArray, isNotNull, isNull } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   certificados,
@@ -16,7 +17,7 @@ import {
   perfiles,
   usuarios,
 } from '@/db/schema';
-import { urlBase } from '@/lib/config';
+import { esEmailAdmin, urlBase } from '@/lib/config';
 import { hashSecreto, tokenAleatorio } from '@/lib/cripto';
 import { VERSION_LEGALES } from '@/lib/legales';
 import { capitalizarNombre, slugificar } from '@/lib/texto';
@@ -76,6 +77,9 @@ export async function consultarEnlace(token: string): Promise<EstadoEnlace> {
   // (por ejemplo, uno que la institución mandó por WhatsApp) no puede abrir la cuenta de nadie.
   // Desde ahí se entra con el código por mail.
   if (fila.enlace.usadoEn || fila.cert.usuarioId) return { estado: 'usado', email };
+  // La institución ve los links que comparte por WhatsApp: si el mail fuera de una cuenta de la
+  // administración o de una institución, el link le abriría esa cuenta. Esas entran sólo con código.
+  if (await esCuentaReservada(email)) return { estado: 'usado', email };
   if (fila.enlace.expiraEn.getTime() < Date.now()) return { estado: 'vencido', email };
   return {
     estado: 'valido',
@@ -91,6 +95,24 @@ export async function consultarEnlace(token: string): Promise<EstadoEnlace> {
       fecha: fila.curso.fecha,
     },
   };
+}
+
+// Mails de la administración o del equipo de una institución: no reciben certificados ni entran por link.
+export async function esCuentaReservada(email: string): Promise<boolean> {
+  return (await cuentasReservadas([email])).size > 0;
+}
+
+export async function cuentasReservadas(emails: string[]): Promise<Set<string>> {
+  const reservadas = new Set(emails.filter(esEmailAdmin));
+  const resto = emails.filter((e) => !reservadas.has(e));
+  if (resto.length > 0) {
+    const equipo = await db
+      .select({ email: usuarios.email })
+      .from(usuarios)
+      .where(and(inArray(usuarios.email, resto), isNotNull(usuarios.institucionId)));
+    for (const u of equipo) reservadas.add(u.email);
+  }
+  return reservadas;
 }
 
 // Marca el link como usado. Devuelve false si otro pedido lo usó antes.
@@ -132,19 +154,20 @@ export async function sumarCertificadoConEnlace(
 }
 
 // Consentimiento + todo lo que se habilita con él: vincular los certificados de ese mail y
-// crear el perfil (privado). Se puede llamar más de una vez sin efectos dobles.
+// crear el perfil (privado). Se puede llamar más de una vez sin efectos dobles. Si había aceptado
+// una versión anterior de los textos, queda registrada la fecha y la versión nuevas.
 export async function aceptarLegales(usuarioId: string): Promise<void> {
   const [u] = await db.select().from(usuarios).where(eq(usuarios.id, usuarioId)).limit(1);
   if (!u) throw new Error('Usuario inexistente');
   const primeraVez = !u.aceptoLegalesEn;
-  if (primeraVez) {
+  if (primeraVez || u.versionLegales !== VERSION_LEGALES) {
     await db
       .update(usuarios)
       .set({ aceptoLegalesEn: new Date(), versionLegales: VERSION_LEGALES })
       .where(eq(usuarios.id, usuarioId));
   }
   await vincularCertificadosPorEmail(usuarioId, u.email);
-  await asegurarPerfil(usuarioId, u.email);
+  await asegurarPerfil(usuarioId);
   if (primeraVez) await db.insert(eventos).values({ tipo: 'cuenta_activada', perfilUsuarioId: usuarioId });
 }
 
@@ -155,24 +178,41 @@ export async function vincularCertificadosPorEmail(usuarioId: string, email: str
     .where(and(eq(certificados.email, email), isNull(certificados.usuarioId)));
 }
 
-// Crea el perfil con el nombre del certificado más reciente. Queda privado.
-async function asegurarPerfil(usuarioId: string, email: string): Promise<void> {
+// Crea el perfil con el nombre del certificado más reciente. Queda privado. Sin certificados, el
+// nombre queda vacío (lo escribe ella en la bienvenida): el mail nunca se usa para el nombre ni el link.
+async function asegurarPerfil(usuarioId: string): Promise<void> {
   const [ya] = await db.select({ id: perfiles.usuarioId }).from(perfiles).where(eq(perfiles.usuarioId, usuarioId)).limit(1);
   if (ya) return;
   const [c] = await db
     .select({ nombre: certificados.titularNombre, apellido: certificados.titularApellido })
     .from(certificados)
     .where(eq(certificados.usuarioId, usuarioId))
-    .orderBy(certificados.emitidoEn)
+    .orderBy(desc(certificados.emitidoEn))
     .limit(1);
-  const nombre = capitalizarNombre(c?.nombre || email.split('@')[0]);
-  const apellido = capitalizarNombre(c?.apellido || '');
-  const slug = await slugLibre(`${nombre} ${apellido}`);
-  await db.insert(perfiles).values({ usuarioId, slug, nombre, apellido }).onConflictDoNothing();
+  const nombre = capitalizarNombre(c?.nombre ?? '');
+  const apellido = capitalizarNombre(c?.apellido ?? '');
+  // Si otra persona con el mismo nombre tomó el link entre la consulta y el alta, se prueba con
+  // otro. Sólo se ignora el choque por usuario (el perfil ya existía).
+  for (let intento = 0; intento < 3; intento++) {
+    const slug = intento === 0 ? await slugLibre(`${nombre} ${apellido}`) : `${slugificar(`${nombre} ${apellido}`) || 'perfil'}-${azar()}`;
+    const creado = await db
+      .insert(perfiles)
+      .values({ usuarioId, slug, nombre, apellido })
+      .onConflictDoNothing()
+      .returning({ id: perfiles.usuarioId });
+    if (creado.length > 0) return;
+    const [existe] = await db.select({ id: perfiles.usuarioId }).from(perfiles).where(eq(perfiles.usuarioId, usuarioId)).limit(1);
+    if (existe) return;
+  }
+  throw new Error('No se pudo crear el perfil');
 }
 
+// Seis letras y números en minúscula, aptos para un link.
+const azar = () => randomBytes(3).toString('hex');
+
+// Sin nombre, la raíz es "perfil" con letras al azar (para que no se pueda recorrer perfil-2, perfil-3...).
 export async function slugLibre(base: string, propioUsuarioId?: string): Promise<string> {
-  const raiz = slugificar(base) || 'perfil';
+  const raiz = slugificar(base) || `perfil-${azar()}`;
   for (let n = 1; n < 500; n++) {
     const candidato = n === 1 ? raiz : `${raiz}-${n}`;
     const [ocupado] = await db
@@ -182,5 +222,5 @@ export async function slugLibre(base: string, propioUsuarioId?: string): Promise
       .limit(1);
     if (!ocupado || ocupado.usuarioId === propioUsuarioId) return candidato;
   }
-  return `${raiz}-${tokenAleatorio().slice(0, 6).toLowerCase()}`;
+  return `${raiz}-${azar()}`;
 }

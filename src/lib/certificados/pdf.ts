@@ -42,6 +42,7 @@ const VERBOS: Record<TipoCurso, string> = {
   congreso: 'asistió a',
   masterclass: 'participó de',
   workshop: 'participó de',
+  jornada: 'asistió a',
 };
 
 function hex(h: string) {

@@ -94,7 +94,7 @@ export function AccionesCertificado({
       </AccionCertificado>
       {!activado && (
         <AccionCertificado accion="link" certificadoId={certificadoId} cursoId={cursoId} nombre={nombre} textoEnviando="Creando…">
-          Copiar link
+          Crear link para WhatsApp
         </AccionCertificado>
       )}
       <Anular certificadoId={certificadoId} cursoId={cursoId} nombre={nombre} />
@@ -105,13 +105,15 @@ export function AccionesCertificado({
 function Anular({ certificadoId, cursoId, nombre }: { certificadoId: string; cursoId: string; nombre: string }) {
   const [estado, enviar] = useActionState<EstadoCertificado, FormData>(accionCertificado, { tipo: 'nada' });
   const error = estado.tipo === 'mensaje' && !estado.ok ? estado.texto : undefined;
+  const motivo = estado.tipo === 'mensaje' ? estado.motivo : undefined;
+  const intento = estado.tipo === 'mensaje' ? (estado.intento ?? 0) : 0;
   return (
-    <details className="group basis-full sm:basis-auto sm:open:basis-full">
-      <summary className="inline-flex min-h-10 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden gap-1.5 rounded-full px-4 text-[0.9375rem] font-semibold text-error hover:bg-error-claro">
+    <details className="group basis-full sm:basis-auto sm:open:basis-full" open={error ? true : undefined}>
+      <summary className="inline-flex min-h-12 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden gap-1.5 rounded-full px-4 text-[0.9375rem] font-semibold text-error hover:bg-error-claro">
         <Icono nombre="cruz-circulo" />
         Anular
       </summary>
-      <form action={enviar} className="mt-3 space-y-3 rounded-2xl border border-error/30 bg-papel p-4" noValidate>
+      <form key={intento} action={enviar} className="mt-3 space-y-3 rounded-2xl border border-error/30 bg-papel p-4" noValidate>
         <input type="hidden" name="accion" value="anular" />
         <input type="hidden" name="certificadoId" value={certificadoId} />
         <input type="hidden" name="cursoId" value={cursoId} />
@@ -124,6 +126,7 @@ function Anular({ certificadoId, cursoId, nombre }: { certificadoId: string; cur
           name="motivo"
           idBase={`motivo-${certificadoId}`}
           ayuda="Es interno: no se muestra en público."
+          defaultValue={motivo}
           error={error}
           className="[&_textarea]:min-h-24"
         />
@@ -147,20 +150,22 @@ export function CorregirEgresada({
   const [estado, enviar] = useActionState<EstadoEgresada, FormData>(corregir, { intento: 0 });
   const [estadoQuitar, enviarQuitar] = useActionState<EstadoEgresada, FormData>(quitar, { intento: 0 });
   const e = estado.errores ?? {};
+  // Con errores, lo que escribió; si no, los datos guardados.
+  const v = estado.errores ? estado.valores : undefined;
   const base = egresada.id;
   return (
     <div className="flex flex-wrap items-start gap-2">
       <details className="basis-full sm:basis-auto sm:open:basis-full" open={Object.keys(e).length > 0 || undefined}>
-        <summary className="inline-flex min-h-10 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden gap-1.5 rounded-full border border-borde px-4 text-[0.9375rem] font-semibold hover:bg-crema-claro">
+        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center [&::-webkit-details-marker]:hidden gap-1.5 rounded-full border border-borde px-4 text-[0.9375rem] font-semibold hover:bg-crema-claro">
           <Icono nombre="editar" />
           Corregir datos
         </summary>
         <form key={estado.intento} action={enviar} className="mt-3 grid gap-3 rounded-2xl border border-borde-suave bg-papel p-4 sm:grid-cols-3" noValidate>
           <input type="hidden" name="egresadaId" value={egresada.id} />
           <input type="hidden" name="cursoId" value={cursoId} />
-          <Campo etiqueta="Nombre" name="nombre" idBase={`${base}-nombre`} defaultValue={egresada.nombre} error={e.nombre} />
-          <Campo etiqueta="Apellido" name="apellido" idBase={`${base}-apellido`} defaultValue={egresada.apellido} error={e.apellido} />
-          <Campo etiqueta="Mail" name="email" type="email" idBase={`${base}-email`} defaultValue={egresada.email} error={e.email} />
+          <Campo etiqueta="Nombre" name="nombre" idBase={`${base}-nombre`} defaultValue={v?.nombre ?? egresada.nombre} error={e.nombre} />
+          <Campo etiqueta="Apellido" name="apellido" idBase={`${base}-apellido`} defaultValue={v?.apellido ?? egresada.apellido} error={e.apellido} />
+          <Campo etiqueta="Mail" name="email" type="email" idBase={`${base}-email`} defaultValue={v?.email ?? egresada.email} error={e.email} />
           <div className="sm:col-span-3">
             <BotonEnviar tamano="sm" textoEnviando="Guardando…">
               Guardar
@@ -176,7 +181,11 @@ export function CorregirEgresada({
           <BotonEnviar variante="fantasma" tamano="sm" icono="basura" textoEnviando="Quitando…">
             Quitar
           </BotonEnviar>
-          {estadoQuitar.error && <p className="mt-1 text-[0.9375rem] text-error">{estadoQuitar.error}</p>}
+          {estadoQuitar.error && (
+            <Aviso tono="error" className="mt-2">
+              {estadoQuitar.error}
+            </Aviso>
+          )}
         </form>
       )}
     </div>
@@ -191,9 +200,9 @@ export function AgregarEgresada({ cursoId }: { cursoId: string }) {
       {estado.ok && <Aviso tono="exito">Listo, la agregamos. Podés seguir cargando.</Aviso>}
       <input type="hidden" name="cursoId" value={cursoId} />
       <div className="grid gap-4 sm:grid-cols-3">
-        <Campo etiqueta="Nombre" name="nombre" idBase="nueva-nombre" autoComplete="off" error={e.nombre} />
-        <Campo etiqueta="Apellido" name="apellido" idBase="nueva-apellido" autoComplete="off" error={e.apellido} />
-        <Campo etiqueta="Mail" name="email" type="email" idBase="nueva-email" autoComplete="off" error={e.email} />
+        <Campo etiqueta="Nombre" name="nombre" idBase="nueva-nombre" autoComplete="off" defaultValue={estado.valores?.nombre} error={e.nombre} />
+        <Campo etiqueta="Apellido" name="apellido" idBase="nueva-apellido" autoComplete="off" defaultValue={estado.valores?.apellido} error={e.apellido} />
+        <Campo etiqueta="Mail" name="email" type="email" idBase="nueva-email" autoComplete="off" defaultValue={estado.valores?.email} error={e.email} />
       </div>
       <BotonEnviar variante="secundario" icono="mas" textoEnviando="Agregando…">
         Agregar egresada

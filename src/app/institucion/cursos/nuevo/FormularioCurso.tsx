@@ -1,23 +1,27 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import { Aviso } from '@/components/ui/Aviso';
 import { BotonEnviar } from '@/components/ui/BotonEnviar';
 import { Campo, Selector } from '@/components/ui/Campo';
+import { fechaLarga } from '@/lib/texto';
 import { nuevoCurso, type EstadoCurso } from '../../acciones';
 
 const TIPOS = [
   { valor: '', texto: 'Elegí una opción' },
   { valor: 'formacion', texto: 'Formación' },
   { valor: 'masterclass', texto: 'Masterclass' },
-  { valor: 'congreso', texto: 'Congreso o jornada' },
-  { valor: 'workshop', texto: 'Workshop' },
+  { valor: 'congreso', texto: 'Congreso' },
+  { valor: 'jornada', texto: 'Jornada' },
+  { valor: 'workshop', texto: 'Taller (workshop)' },
 ];
 
 export function FormularioCurso() {
   const [estado, enviar] = useActionState<EstadoCurso, FormData>(nuevoCurso, { intento: 0 });
   const v = estado.valores;
   const e = estado.errores ?? {};
+  // La fecha elegida, escrita en palabras: según el idioma del navegador, el campo muestra mm/dd.
+  const [fecha, setFecha] = useState(v?.fecha ?? '');
   return (
     <form key={estado.intento} action={enviar} className="space-y-6" noValidate>
       {Object.keys(e).length > 0 && <Aviso tono="error">Revisá los datos marcados.</Aviso>}
@@ -46,8 +50,19 @@ export function FormularioCurso() {
         name="fecha"
         type="date"
         defaultValue={v?.fecha}
+        onChange={(ev) => setFecha(ev.currentTarget.value)}
         error={e.fecha}
-        ayuda="La de realización, o la de finalización si duró varios meses. Es la que figura en el certificado."
+        ayuda={
+          <>
+            La de realización, o la de finalización si duró varios meses. Es la que figura en el certificado.
+            {/^\d{4}-\d{2}-\d{2}$/.test(fecha) && (
+              <>
+                {' '}
+                Elegiste el <strong className="text-tinta">{fechaLarga(fecha)}</strong>: revisá el día y el mes.
+              </>
+            )}
+          </>
+        }
         required
       />
       <Campo etiqueta="Docente o disertante" name="docente" opcional defaultValue={v?.docente} error={e.docente} />

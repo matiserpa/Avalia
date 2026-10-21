@@ -79,7 +79,7 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 
 - `/activar/[token]`: muestra el certificado; activa sólo con la casilla de términos y privacidad tildada (error asociado al campo). Si quien abre el link ya tiene su pasaporte con otro mail, ofrece "Sumar a mi pasaporte".
 - **Seguridad:** un link de activación deja de servir para entrar en cuanto el certificado queda en una cuenta (`consultarEnlace`). Así un link viejo, por ejemplo uno que la institución mandó por WhatsApp, no abre la cuenta de nadie.
-- `/bienvenida` (consentimiento, si entró con código, y perfil en una pantalla) y `/bienvenida/listo` (vista previa con "Publicar mi perfil" o "Ahora no").
+- `/bienvenida` (consentimiento, si entró con código, y perfil en una pantalla) y `/bienvenida/listo` (vista previa con "Publicar mi perfil" o "Seguir sin publicar").
 - `/panel`: estado del perfil, link, certificados con interruptor "Mostrar en mi perfil" y descarga del PDF (registra `pdf_descarga`). Los anulados se listan aparte.
 - `/panel/perfil`: foto (se achica a WebP; la anterior se borra), profesión, ciudad, matrícula (con "Mostrarla en mi perfil"), contacto por WhatsApp o Instagram.
 - `/panel/compartir`: link para copiar o compartir, QR para imprimir (sólo la tarjeta) o descargar en PNG, e imagen para historias de 1080×1920. Cada acción registra `compartir` con su canal.
@@ -116,26 +116,69 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 - Prueba de punta a punta del recorrido completo (`tests/e2e/demo.spec.ts`).
 - **Para escanear el QR con un celular, el sitio tiene que estar publicado** (`APP_URL` con un dominio): con la demo en una compu (`localhost`), el celular no llega. La guía lo avisa y ofrece abrir la verificación en la compu.
 
-## Falta (en este orden)
+## Hecho (etapa 7: revisión final)
 
-7. **Revisión final:**
-   - Privacidad y permisos.
-   - Accesibilidad.
-   - Textos (rioplatense, sin emojis ni tecnicismos).
-   - Celular.
-   - Prueba de punta a punta del recorrido de demo.
-8. **`docs/despliegue.md`:**
-   - Supabase (pooler, puerto 6543) y Resend con dominio propio.
-   - Hosting:
-     - Vercel Pro: el plan gratis no admite uso comercial.
-     - Netlify: su integración con Next 16 no está verificada.
-   - Variables de entorno.
-   - Ambientes separados para demo y piloto.
+Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos, celular y lógica), con código y pantallas reales, y cada hallazgo verificado por separado. Lo que se arregló:
+
+- **Seguridad:**
+  - Una institución podía abrir la cuenta de otra institución, o la de la administración, emitiendo un certificado a ese mail y usando el link para WhatsApp. Ahora esos mails no se pueden cargar como egresadas, y su link nunca abre la cuenta: entran sólo con código (`esCuentaReservada` en `src/lib/auth/activacion.ts`).
+  - El límite de 5 intentos por código se salteaba con pedidos simultáneos. Ahora cada intento se cuenta antes de comparar, en una sola sentencia.
+  - Redirección abierta en `/demo/entrar`.
+- **Privacidad:**
+  - Pedir códigos ya no revela si un mail está en la plataforma: la respuesta es siempre la misma y el mail sale después de responder.
+  - El DNI podía quedar guardado como apellido en una planilla sin encabezados. Ahora una columna de documentos se ignora aunque alguna celda diga "s/d", y un nombre con números no se carga.
+  - El link del perfil podía armarse con la parte del mail antes de la @. Ahora nunca usa el mail, y sigue al nombre hasta la primera publicación.
+  - Si cambia `VERSION_LEGALES`, a cada profesional se le pide aceptar los textos nuevos antes de usar su panel (`consentimientoVigente`).
+  - En el piloto, sin `MAIL_MODE=resend` no sale ningún mail, así no queda guardado el cuerpo de los mails en la base. Sin `APP_URL` (o, en Vercel, sin `DATABASE_URL`) el sitio avisa con un error claro.
+- **Accesibilidad:**
+  - Al volver con errores, el foco va al primer campo con error (o al aviso).
+  - Todos los botones miden 48 px.
+  - Foco visible en el campo de "Copiar".
+  - Las barras fijas (arriba y abajo) no tapan el foco.
+  - Los gráficos ya no tienen carteles flotantes que tapan datos.
+  - Contraste del texto de ejemplo, títulos de página, jerarquía de títulos y nombre accesible del logo.
+- **Textos:**
+  - Botones con verbo: "Crear un curso", "Crear link para WhatsApp", "Seguir sin publicar".
+  - Nada de "te llega un mail": decimos "te mandamos un mail".
+  - "No pudimos mandar el mail".
+  - "formación verificada" sólo si hay certificados a la vista.
+  - Singular y plural; "e" antes de i; "Taller" en vez de "Workshop" y un tipo nuevo "Jornada" (migración `drizzle/0001_tipo_jornada.sql`).
+  - Fecha del curso escrita en palabras para revisar día y mes.
+  - Campos para subir archivos en castellano.
+- **Lógica:**
+  - CSV de Excel en Windows (Windows-1252) sin romper tildes.
+  - Apellidos con apóstrofo ("D'Angelo").
+  - Los formularios ya no pierden lo escrito cuando vuelven con errores.
+  - La emisión no se traga errores y no emite si la lista cambió mientras se revisaba.
+  - "1.200" horas son mil doscientas.
+  - Las fechas imposibles se rechazan.
+  - Las métricas cuentan a cada persona una vez.
+- **Celular:**
+  - Las fotos y los logos se achican en el navegador antes de subirse: Vercel corta en 4,5 MB. Si se toca "Guardar" mientras se achica la foto, el envío espera.
+  - El link de la profesional se ve completo.
+  - Los botones de dos renglones quedan centrados.
+- **Pruebas:** `tests/unit/seguridad.test.ts` cubre cada arreglo de seguridad, privacidad y lógica (la de intentos simultáneos falla con el código anterior).
+
+## Hecho (etapa 8: despliegue)
+
+- `docs/despliegue.md`: Supabase (pooler en modo transacción, puerto 6543; migraciones por el puerto 5432), Resend con dominio propio (SPF, DKIM y DMARC; tope de 100 mails por día en el plan gratis), Vercel Pro en São Paulo, variables de entorno, ambientes separados de demo y piloto, primer despliegue paso a paso, costos y mantenimiento.
+- `vercel.json` con la región `gru1`, `engines` en `package.json` y límite de 4 MB por imagen en el servidor. Los SVG se aceptan sólo para logos y siempre se convierten a WebP.
+
+## Falta
+
+- Lo de "Antes del primer despliegue" en `docs/despliegue.md`: dominio, marca en el INPI, inscripción en la AAIP, revisión legal y logo.
 
 ## Para confirmar con el cliente (surgió en las etapas 3 a 6)
 
 - **Sumar un certificado de otro mail:** si a una profesional con cuenta le llega por error el link de otra persona, podría sumarlo. Hoy el perfil lo muestra con "A nombre de …". Alternativa más estricta: exigir que el nombre coincida (complica a quien cambió de apellido).
 - **El link que la institución copia para WhatsApp es una llave de entrada** hasta que la profesional activa: sirve una vez, vence a los 45 días y deja de servir al activar. Conviene que las instituciones no lo manden a grupos.
+
+## Para confirmar con el cliente (surgió en la revisión final)
+
+- **Quien abre el link para WhatsApp acepta los términos en nombre de la profesional.** La institución ve ese link: alguien de la institución podría activar el pasaporte de una egresada, y de paso ver los certificados que otras instituciones le emitieron a ese mismo mail. Para el piloto, con dos instituciones aliadas, propongo dejarlo como está y sumar al acuerdo con cada institución que ese link es sólo para la egresada. Para después del piloto, la alternativa es que activar con un link compartido pida además un código por mail (con el costo de que no sirve si el mail estaba mal escrito, que es justo cuando se usa WhatsApp).
+- **El PDF dice "CERTIFICADO" y "Se certifica que…"** y no aclara que acompaña al certificado de la institución ni que no reemplaza la matrícula (la verificación sí lo aclara). Propuesta para validar con el abogado: sumar al pie "Copia digital emitida por {institución} con Sella. Acompaña al certificado de la institución y no reemplaza la matrícula profesional."
+- **Las sesiones duran 30 días** desde que se ingresa; después se pide un código nuevo. No se renuevan solas.
+- **Tipos de curso:** se agregó "Jornada" y "Workshop" se muestra como "Taller". Confirmar que así lo llaman las instituciones.
 
 ## Decisiones aplicadas por defecto (pendientes de confirmación del cliente)
 

@@ -9,7 +9,8 @@ import { Icono } from '@/components/ui/Icono';
 import { registrarCompartir } from './acciones';
 
 export function CopiarLink({ texto, etiqueta }: { texto: string; etiqueta: string }) {
-  return <CopiarTexto texto={texto} etiqueta={etiqueta} alCopiar={() => void registrarCompartir('copiar_link')} />;
+  const legible = texto.replace(/^https?:\/\//, '').replace(/\?.*$/, '');
+  return <CopiarTexto texto={texto} etiqueta={etiqueta} legible={legible} alCopiar={() => void registrarCompartir('copiar_link')} />;
 }
 
 // "Compartir" del celular (WhatsApp, Instagram, mail…). Sólo aparece si el navegador lo permite.

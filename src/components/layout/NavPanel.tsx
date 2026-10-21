@@ -23,7 +23,7 @@ export function NavSuperior({ items }: { items: ItemNav[] }) {
               <Link
                 href={it.href}
                 aria-current={a ? 'page' : undefined}
-                className={`inline-flex min-h-11 items-center gap-2 rounded-full px-4 font-semibold ${
+                className={`inline-flex min-h-12 items-center gap-2 rounded-full px-4 font-semibold ${
                   a ? 'bg-tinta text-marfil' : 'text-tinta hover:bg-crema-claro'
                 }`}
               >
@@ -44,6 +44,7 @@ export function NavInferior({ items }: { items: ItemNav[] }) {
   return (
     <nav
       aria-label="Secciones"
+      data-barra-inferior
       className="no-imprimir fixed inset-x-0 bottom-0 z-40 border-t border-borde-suave bg-papel/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
     >
       <ul className="mx-auto flex max-w-md">

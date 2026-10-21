@@ -75,7 +75,7 @@ export default async function GuiaDemo({ searchParams }: PageProps<'/demo'>) {
                 publicalo. Lleva menos de un minuto.
               </>
             ) : (
-              'Primero hacé el paso 1: al emitir, a Camila le llega un mail para activar su pasaporte.'
+              'Primero hacé el paso 1: al emitir, a Camila le mandamos un mail para que active su pasaporte.'
             )}
           </Paso>
 

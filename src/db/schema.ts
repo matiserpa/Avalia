@@ -106,7 +106,7 @@ export const perfiles = pgTable(
 );
 
 // ---------- cursos ----------
-export const tipoCurso = pgEnum('tipo_curso', ['formacion', 'masterclass', 'congreso', 'workshop']);
+export const tipoCurso = pgEnum('tipo_curso', ['formacion', 'masterclass', 'congreso', 'workshop', 'jornada']);
 
 export const cursos = pgTable(
   'cursos',

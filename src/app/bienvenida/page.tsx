@@ -6,7 +6,9 @@ import { valoresInicialesPerfil } from '@/features/profesional/perfil';
 import { requerirSesion } from '@/lib/auth/guardas';
 import { destinoInicial } from '@/lib/auth/sesion';
 import { urlImagen } from '@/lib/imagenes-url';
+import { consentimientoVigente, FECHA_LEGALES } from '@/lib/legales';
 import { guardarBienvenida } from './acciones';
+import { FormularioNuevaVersion } from './NuevaVersion';
 
 export const metadata: Metadata = { title: 'Tu perfil' };
 
@@ -14,7 +16,23 @@ export const metadata: Metadata = { title: 'Tu perfil' };
 export default async function Bienvenida() {
   const s = await requerirSesion();
   if (s.esAdmin || s.usuario.institucionId) redirect(destinoInicial(s));
-  const pedirConsentimiento = !s.usuario.aceptoLegalesEn;
+  const pedirConsentimiento = !consentimientoVigente(s.usuario);
+
+  // Ya tenía su pasaporte y cambiaron los términos: sólo se le pide que los acepte de nuevo.
+  if (pedirConsentimiento && s.usuario.aceptoLegalesEn && s.perfil) {
+    return (
+      <PaginaPublica ancho="angosto" mostrarVerificar={false}>
+        <div className="mx-auto max-w-lg pt-4 sm:pt-8">
+          <h1 className="text-[2rem] font-bold leading-tight tracking-tight">Actualizamos los términos</h1>
+          <p className="mt-2 mb-8 text-[1.0625rem] text-tinta-suave">
+            Cambiamos los términos y la política de privacidad ({FECHA_LEGALES}). Leelos y, si estás de acuerdo, aceptalos para seguir
+            usando tu pasaporte. Tu perfil y tus certificados siguen como estaban.
+          </p>
+          <FormularioNuevaVersion />
+        </div>
+      </PaginaPublica>
+    );
+  }
 
   const iniciales = await valoresInicialesPerfil(s);
 

@@ -49,3 +49,11 @@ test('la guía y la bandeja responden en modo demo', async ({ request }) => {
   expect((await request.get('/demo')).status()).toBe(200);
   expect((await request.get('/demo/bandeja')).status()).toBe(200);
 });
+
+test('entrar como alguien de la demo nunca redirige a otro sitio', async ({ request, baseURL }) => {
+  for (const a of ['//otro-sitio.example/x', '/\\otro-sitio.example', 'https://otro-sitio.example/']) {
+    const r = await request.get(`/demo/entrar?email=valentina.rios@demo.example&a=${encodeURIComponent(a)}`, { maxRedirects: 0 });
+    expect(r.status()).toBe(307);
+    expect(new URL(r.headers()['location'], baseURL).origin).toBe(new URL(baseURL!).origin);
+  }
+});

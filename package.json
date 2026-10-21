@@ -2,6 +2,9 @@
   "name": "sella",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:demo": "DEMO_MODE=true next dev",
