@@ -1,4 +1,4 @@
-# AvalYa
+# Sella
 
 Prototipo y piloto de certificados verificables y perfil profesional (el "pasaporte" de cada profesional) para la estética.
 

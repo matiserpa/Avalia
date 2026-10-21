@@ -1,4 +1,4 @@
-// Modelo de datos de AvalYa.
+// Modelo de datos de Sella.
 //
 // Tres ideas lo ordenan:
 // 1. El certificado es de la institución: guarda una COPIA del nombre de la titular al momento

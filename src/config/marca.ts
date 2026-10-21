@@ -1,12 +1,12 @@
-// Todo lo que cambia con la marca vive acá y en src/components/marca/. El nombre es AvalYa; el
+// Todo lo que cambia con la marca vive acá y en src/components/marca/. El nombre es Sella; el
 // dominio todavía no está definido (sale de APP_URL).
 // Colores: src/app/globals.css (tokens --color-*). Tipografía: src/app/fuentes.ts.
 
 export const MARCA = {
   // Nombre del producto tal como se lee en pantalla, mails y certificados.
-  nombre: 'AvalYa',
+  nombre: 'Sella',
   // Versión corta para lugares chicos (pestaña del navegador, encabezado en celular).
-  nombreCorto: 'AvalYa',
+  nombreCorto: 'Sella',
   // Una línea que explica qué es.
   bajada: 'La formación de tu profesional de la estética, verificada.',
   descripcion:
