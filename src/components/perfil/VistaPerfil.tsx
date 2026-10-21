@@ -12,7 +12,7 @@ import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import { Icono } from '@/components/ui/Icono';
 import { LogoInstitucion } from '@/components/ui/LogoInstitucion';
 import { Etiqueta, SelloVerificado } from '@/components/ui/Sello';
-import { institucionesDe, porAnio, type DatosPerfil } from '@/features/publico/perfil';
+import { aOtroNombre, institucionesDe, porAnio, type DatosPerfil } from '@/features/publico/perfil';
 import { urlImagen } from '@/lib/imagenes-url';
 import { cantidad, fechaLarga, horas, linkContacto, listaConY, nombreCompleto, TIPOS_CURSO, usuarioInstagram } from '@/lib/texto';
 
@@ -99,6 +99,11 @@ export function VistaPerfil({ datos, nivel = 1 }: { datos: DatosPerfil; nivel?: 
                         <p className="text-[0.9375rem] text-tinta-suave">
                           {TIPOS_CURSO[c.tipo].nombre} de {horas(c.cargaHoraria)} · {fechaLarga(c.fecha)}
                         </p>
+                        {aOtroNombre(c, perfil) && (
+                          <p className="text-[0.9375rem]">
+                            A nombre de <strong>{c.titular}</strong>
+                          </p>
+                        )}
                         <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                           <SelloVerificado />
                           <Link

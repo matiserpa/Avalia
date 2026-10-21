@@ -6,12 +6,12 @@
 
 import 'server-only';
 import { cache } from 'react';
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { certificados, cursos, instituciones, perfiles, type Canal, type Perfil, type TipoCurso } from '@/db/schema';
 import type { SesionActual } from '@/lib/auth/sesion';
 import { esRobot, registrarEvento } from '@/lib/eventos';
-import { anioDe } from '@/lib/texto';
+import { anioDe, nombreCompleto, slugificar } from '@/lib/texto';
 
 export type CertificadoDePerfil = {
   id: string;
@@ -22,6 +22,8 @@ export type CertificadoDePerfil = {
   fecha: string;
   institucion: string;
   institucionLogoId: string | null;
+  // El nombre que figura en el certificado (lo puso la institución al emitirlo).
+  titular: string;
 };
 
 export type DatosPerfil = {
@@ -41,6 +43,7 @@ export async function certificadosVisibles(usuarioId: string): Promise<Certifica
       fecha: cursos.fecha,
       institucion: instituciones.nombre,
       institucionLogoId: instituciones.logoId,
+      titular: sql<string>`${certificados.titularNombre} || ' ' || ${certificados.titularApellido}`,
     })
     .from(certificados)
     .innerJoin(cursos, eq(cursos.id, certificados.cursoId))
@@ -87,4 +90,10 @@ export async function registrarVisitaPerfil(perfilUsuarioId: string, sesion: Ses
   if (sesion && (sesion.usuario.id === perfilUsuarioId || sesion.esAdmin)) return;
   if (await esRobot()) return;
   await registrarEvento({ tipo: 'perfil_visita', canal, perfilUsuarioId });
+}
+
+// ¿El certificado está a nombre de otra persona que la del perfil? Puede pasar por un cambio de
+// apellido, o si alguien sumó un certificado ajeno: en los dos casos el perfil lo muestra.
+export function aOtroNombre(c: CertificadoDePerfil, perfil: Pick<Perfil, 'nombre' | 'apellido'>): boolean {
+  return slugificar(c.titular) !== slugificar(nombreCompleto(perfil));
 }

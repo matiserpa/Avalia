@@ -3,7 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { certificados, eventos, usuarios } from '@/db/schema';
 import { reiniciarDemo, DEMO } from '@/lib/demo/semilla';
-import { perfilPorSlug, porAnio, registrarVisitaPerfil } from '@/features/publico/perfil';
+import { aOtroNombre, perfilPorSlug, porAnio, registrarVisitaPerfil } from '@/features/publico/perfil';
 import type { SesionActual } from '@/lib/auth/sesion';
 
 async function visitas(usuarioId: string) {
@@ -36,6 +36,13 @@ describe('perfil público', () => {
     expect(datos?.certificados).toHaveLength(3);
     expect(datos?.certificados.some((c) => c.codigo === DEMO.codigoValentinaMasterclass)).toBe(false);
     await db.update(certificados).set({ visibleEnPerfil: true }).where(eq(certificados.codigo, DEMO.codigoValentinaMasterclass));
+  });
+
+  it('marca los certificados a nombre de otra persona', async () => {
+    const datos = (await perfilPorSlug(DEMO.slugValentina))!;
+    expect(datos.certificados.every((c) => !aOtroNombre(c, datos.perfil))).toBe(true);
+    expect(aOtroNombre(datos.certificados[0], { nombre: 'Valentina', apellido: 'Ríos Peña' })).toBe(true);
+    expect(aOtroNombre(datos.certificados[0], { nombre: 'VALENTINA', apellido: 'rios' })).toBe(false);
   });
 
   it('rechaza links raros sin consultar', async () => {
