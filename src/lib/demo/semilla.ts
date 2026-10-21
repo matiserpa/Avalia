@@ -329,7 +329,8 @@ export async function cargarDemo(): Promise<void> {
       tipo: 'perfil_visita',
       canal: canalesVisita[i % canalesVisita.length],
       perfilUsuarioId: i % 4 === 0 ? agustina.id : valentina.id,
-      creadoEn: haceDias(37 - Math.floor(i * 0.78), 9 + (i % 12)),
+      // Más visitas cuanto más reciente: el piloto va creciendo.
+      creadoEn: haceDias(37 - Math.round(37 * Math.sqrt(i / 45)), 9 + (i % 12)),
     });
   }
   const certsVerificados = [certValentinaFormacion, certValentinaMasterclass, certValentinaWorkshop, certAgustina];
@@ -340,7 +341,7 @@ export async function cargarDemo(): Promise<void> {
       canal: i % 3 === 0 ? 'perfil' : i % 5 === 0 ? 'codigo' : 'qr',
       certificadoId: c.id,
       institucionId: c.institucionId,
-      creadoEn: haceDias(36 - i * 2, 10 + (i % 9)),
+      creadoEn: haceDias(36 - Math.round(36 * Math.sqrt(i / 16)), 10 + (i % 9)),
     });
   }
   ev.push({ tipo: 'verificacion_fallida', canal: 'codigo', creadoEn: haceDias(12) });

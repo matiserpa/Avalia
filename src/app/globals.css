@@ -24,6 +24,9 @@
   --color-error-claro: #f6e1dc;
   --color-borde: #857768;
   --color-borde-suave: #d5cabb;
+  /* Gráficos de métricas (un solo color: el verde es sólo para lo verificado). Validado con la
+     guía de visualización: luminosidad, saturación y contraste 5,2:1 sobre papel. */
+  --color-dato: #a2582c;
 
   --radius-tarjeta: 1.25rem;
   --shadow-tarjeta: 0 1px 2px rgb(15 18 16 / 0.04), 0 8px 24px -12px rgb(15 18 16 / 0.12);

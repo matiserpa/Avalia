@@ -61,6 +61,15 @@ describe('panel de la institución', () => {
     expect((await quitarEgresada(instituto, camila.id)).ok).toBe(false);
   });
 
+  it('cuenta egresadas, emitidos y activados por curso', async () => {
+    const { instituto } = await ids();
+    const lista = await listarCursos(instituto);
+    const porNombre = Object.fromEntries(lista.map((c) => [c.nombre, [c.egresadas, c.emitidos, c.activados, c.sinEmitir]]));
+    expect(porNombre['Congreso Demo 2026']).toEqual([5, 0, 0, 5]);
+    // Formación: 6 egresadas, 6 válidos (el de Sofía se anuló y se volvió a emitir), 3 activados.
+    expect(porNombre['Formación Demo en Cosmiatría']).toEqual([6, 6, 3, 0]);
+  });
+
   it('una institución no puede ver ni tocar los cursos ni los certificados de otra', async () => {
     const { asociacion, congreso, instituto } = await ids();
     expect(await obtenerCurso(asociacion, congreso)).toBeNull();

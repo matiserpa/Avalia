@@ -98,9 +98,19 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 - `/institucion/cursos/[id]/emitir`: confirmación con la lista de nombres y el certificado de muestra (`/muestra`, con marca de agua). Si la egresada ya tiene su pasaporte con ese mail, el certificado se suma directo y el mail la invita a entrar, sin link de activación.
 - Toda consulta filtra por el `institucionId` de la sesión (`src/features/institucion/`); hay pruebas de que una institución no ve ni toca lo de otra.
 
+## Hecho (etapa 5: panel admin)
+
+- `/admin`: instituciones con sus cursos, certificados emitidos y equipo. Alta con nombre, ciudad, logo (obligatorio: va en cada certificado) y mail de la responsable, que recibe una invitación. "Sumar a otra persona" para invitar a más gente del equipo. No suma un mail que ya es de una profesional, de otra institución o de la administración.
+- `/admin/metricas` (`src/features/admin/metricas.ts`): filtro de período (4 u 8 semanas o todo el piloto) e institución, en una fila arriba de todo.
+  - ¿Activan y comparten?: certificados emitidos, activación con medidor (activadas / personas con certificado), perfiles públicos y perfiles que compartieron.
+  - ¿Los pacientes miran y verifican?: visitas y verificaciones (más las fallidas), por semana (lunes a domingo, hora argentina).
+  - Por dónde llegan: barras por canal de visitas, verificaciones y de cómo comparten.
+  - Tabla por institución.
+- Gráficos en HTML y CSS (`src/components/graficos/`), con un solo color (`--color-dato`, validado: el verde queda para lo verificado), valor de cada marca con el mouse o el teclado, y "Ver como tabla" en cada uno.
+- Arreglo: los conteos de la lista de cursos (etapa 4) daban 0. En el `select` de una sola tabla, Drizzle escribe las columnas sin la tabla y la subconsulta tomaba la suya. Ahora la columna de afuera va escrita entera, con pruebas.
+
 ## Falta (en este orden)
 
-5. **Panel admin:** alta de instituciones con logo e invitación, y métricas del piloto (ver `docs/modelo-de-datos.md`).
 6. **Demo:**
    - `/demo`: guía del recorrido de 2 minutos, accesos rápidos y reiniciar.
    - `/demo/bandeja`: los mails en pantalla.

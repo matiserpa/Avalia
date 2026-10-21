@@ -14,12 +14,14 @@ export async function obtenerInstitucion(institucionId: string) {
 export type ResumenCurso = Curso & { egresadas: number; emitidos: number; activados: number; sinEmitir: number };
 
 export async function listarCursos(institucionId: string): Promise<ResumenCurso[]> {
+  // En el select de una sola tabla, Drizzle escribe las columnas sin el nombre de la tabla
+  // ("id"): dentro de la subconsulta eso sería la columna de adentro. Por eso va escrito entero.
   const filas = await db
     .select({
       curso: cursos,
-      egresadas: sql<number>`(select count(*)::int from ${egresadas} e where e.curso_id = ${cursos.id})`,
-      emitidos: sql<number>`(select count(*)::int from ${certificados} c where c.curso_id = ${cursos.id} and c.estado = 'valido')`,
-      activados: sql<number>`(select count(*)::int from ${certificados} c where c.curso_id = ${cursos.id} and c.estado = 'valido' and c.usuario_id is not null)`,
+      egresadas: sql<number>`(select count(*)::int from ${egresadas} e where e.curso_id = "cursos"."id")`,
+      emitidos: sql<number>`(select count(*)::int from ${certificados} c where c.curso_id = "cursos"."id" and c.estado = 'valido')`,
+      activados: sql<number>`(select count(*)::int from ${certificados} c where c.curso_id = "cursos"."id" and c.estado = 'valido' and c.usuario_id is not null)`,
     })
     .from(cursos)
     .where(eq(cursos.institucionId, institucionId))
