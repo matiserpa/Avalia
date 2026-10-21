@@ -1,11 +1,12 @@
-// Todo lo que cambia cuando tengamos la marca definitiva vive acá y en src/components/marca/.
+// Todo lo que cambia con la marca vive acá y en src/components/marca/. El nombre es AvalYa; el
+// dominio todavía no está definido (sale de APP_URL).
 // Colores: src/app/globals.css (tokens --color-*). Tipografía: src/app/fuentes.ts.
 
 export const MARCA = {
   // Nombre del producto tal como se lee en pantalla, mails y certificados.
-  nombre: 'Pasaporte Profesional',
+  nombre: 'AvalYa',
   // Versión corta para lugares chicos (pestaña del navegador, encabezado en celular).
-  nombreCorto: 'Pasaporte',
+  nombreCorto: 'AvalYa',
   // Una línea que explica qué es.
   bajada: 'La formación de tu profesional de la estética, verificada.',
   descripcion:

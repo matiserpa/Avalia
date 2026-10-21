@@ -53,10 +53,10 @@ export function correoCertificado(d: {
     : `${d.institucion} te emitió un certificado`;
   const intro = d.yaTieneCuenta
     ? `<p style="margin:0 0 12px;">Hola, ${escapar(d.nombre)}:</p>
-<p style="margin:0;">${escapar(d.institucion)} te emitió el certificado de <strong>${escapar(d.curso)}</strong>. Ya está en tu ${escapar(MARCA.nombre)}.</p>`
+<p style="margin:0;">${escapar(d.institucion)} te emitió el certificado de <strong>${escapar(d.curso)}</strong>. Ya está en tu pasaporte de ${escapar(MARCA.nombre)}.</p>`
     : `<p style="margin:0 0 12px;">Hola, ${escapar(d.nombre)}:</p>
 <p style="margin:0 0 12px;">${escapar(d.institucion)} te emitió el certificado de <strong>${escapar(d.curso)}</strong>.</p>
-<p style="margin:0;">Activá tu ${escapar(MARCA.nombre)} para descargarlo y armar tu perfil con toda tu formación, verificada. Te lleva menos de dos minutos y no necesitás contraseña.</p>`;
+<p style="margin:0;">Activá tu pasaporte en ${escapar(MARCA.nombre)} para descargarlo y armar tu perfil con toda tu formación, verificada. Te lleva menos de dos minutos y no necesitás contraseña.</p>`;
   const html = marco(
     `Tu certificado de ${d.curso} ya es verificable.`,
     `${intro}${boton(d.yaTieneCuenta ? 'Ver mi pasaporte' : 'Activar mi pasaporte', d.enlace)}

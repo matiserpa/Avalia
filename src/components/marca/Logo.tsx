@@ -1,4 +1,4 @@
-// Logo provisorio del Pasaporte Profesional. Cuando haya marca, se reemplaza este archivo
+// Logo provisorio de AvalYa (el nombre ya está; el diseño del logo todavía no). Se reemplaza este archivo
 // (y el nombre en src/config/marca.ts) y cambia en todo el sitio.
 
 import { MARCA } from '@/config/marca';

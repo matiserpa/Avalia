@@ -4,7 +4,7 @@
 
 ## Contexto
 
-**Etapa actual: exploración de la idea.** El nombre ("Pasaporte Profesional", "Avalia") es provisorio, no hay dominio ni marca y no se imprime nada todavía. Prioridad: un prototipo que se entienda en una reunión.
+**Etapa actual: exploración de la idea.** El nombre es **AvalYa** (antes "Pasaporte Profesional" / "Avalia"). Todavía no hay logo ni dominio (`avalya.com` está registrado por otra persona) y no se imprime nada. Prioridad: un prototipo que se entienda en una reunión.
 
 Lo arma Impulso Creativo, una agencia de Buenos Aires especializada en salud, estética y bienestar.
 
@@ -104,7 +104,7 @@ Están en `docs/producto.md`, sección "Decisiones tomadas". Resumen:
 3. Borrar la cuenta deja los certificados desvinculados (a validar con el abogado).
 4. La verificación aclara su alcance ("No reemplaza la matrícula profesional").
 5. El PDF acompaña al de la institución, no lo reemplaza. No lleva DNI y el DNI no se guarda.
-6. El dominio de los QR sale de `APP_URL`. Por ahora es una idea en exploración: **no hay dominio ni marca definidos** ("Pasaporte Profesional" y "Avalia" son nombres provisorios) y no se va a imprimir nada todavía. No hace falta preguntarlo de nuevo: se define recién antes de emitir certificados reales en el piloto.
+6. El dominio de los QR sale de `APP_URL`. Por ahora es una idea en exploración: **no hay dominio ni logo definidos** (el nombre ya es AvalYa) y no se va a imprimir nada todavía. No hace falta preguntarlo de nuevo: se define recién antes de emitir certificados reales en el piloto.
 
 ## Cambio de stack respecto de la propuesta inicial
 

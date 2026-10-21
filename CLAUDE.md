@@ -1,6 +1,6 @@
-# Pasaporte Profesional (Avalia)
+# AvalYa
 
-Prototipo y piloto de certificados verificables y perfil profesional para la estética.
+Prototipo y piloto de certificados verificables y perfil profesional (el "pasaporte" de cada profesional) para la estética.
 
 Antes de tocar código, leé `docs/estado.md` (qué está hecho y qué sigue) y además:
 - `docs/producto.md`: qué es, mapa de pantallas, flujos, decisiones, privacidad y tono.

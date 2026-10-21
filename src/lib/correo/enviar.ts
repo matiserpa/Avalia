@@ -5,6 +5,7 @@
 import 'server-only';
 import { db } from '@/db';
 import { correos } from '@/db/schema';
+import { MARCA } from '@/config/marca';
 import { modoCorreo } from '@/lib/config';
 
 export type Correo = {
@@ -20,7 +21,7 @@ export type Correo = {
 export type ResultadoEnvio = { ok: true } | { ok: false; error: string };
 
 function remitente(): string {
-  return process.env.MAIL_FROM || 'Pasaporte Profesional <no-responder@example.com>';
+  return process.env.MAIL_FROM || `${MARCA.nombre} <no-responder@example.com>`;
 }
 
 async function registrar(c: Correo, r: ResultadoEnvio, guardarCuerpo: boolean) {
