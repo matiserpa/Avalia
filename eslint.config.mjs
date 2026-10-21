@@ -12,6 +12,12 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Compilaciones de las pruebas de punta a punta (NEXT_DIST_DIR), datos locales y capturas.
+    ".next-*/**",
+    ".data/**",
+    "capturas/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

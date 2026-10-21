@@ -157,3 +157,14 @@ export function linkContacto(tipo: 'whatsapp' | 'instagram' | null, valor: strin
   const u = usuarioInstagram(valor);
   return u ? `https://instagram.com/${u}` : null;
 }
+
+// ["a", "b", "c"] → "a, b y c"
+export function listaConY(items: string[]): string {
+  if (items.length <= 1) return items[0] ?? '';
+  return `${items.slice(0, -1).join(', ')} y ${items[items.length - 1]}`;
+}
+
+// (1, 'certificado', 'certificados') → "1 certificado"; (3, ...) → "3 certificados"
+export function cantidad(n: number, singular: string, plural: string): string {
+  return `${n} ${n === 1 ? singular : plural}`;
+}
