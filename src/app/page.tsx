@@ -46,9 +46,14 @@ export default async function Portada({ searchParams }: PageProps<'/'>) {
       {modoDemo() && (
         <Aviso tono="info" titulo="Estás en la demo" className="mb-6">
           Los datos son inventados.{' '}
+          <Link href="/demo" className="font-semibold underline underline-offset-4">
+            Ver la guía de la demo
+          </Link>{' '}
+          o{' '}
           <Link href={`/p/${DEMO.slugValentina}`} className="font-semibold underline underline-offset-4">
-            Ver un perfil de ejemplo
+            un perfil de ejemplo
           </Link>
+          .
         </Aviso>
       )}
 

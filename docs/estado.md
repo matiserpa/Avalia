@@ -109,11 +109,15 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
 - Gráficos en HTML y CSS (`src/components/graficos/`), con un solo color (`--color-dato`, validado: el verde queda para lo verificado), valor de cada marca con el mouse o el teclado, y "Ver como tabla" en cada uno.
 - Arreglo: los conteos de la lista de cursos (etapa 4) daban 0. En el `select` de una sola tabla, Drizzle escribe las columnas sin la tabla y la subconsulta tomaba la suya. Ahora la columna de afuera va escrita entera, con pruebas.
 
+## Hecho (etapa 6: demo)
+
+- `/demo`: el recorrido de 2 minutos en tres pasos, con el estado de cada uno ("Hecho"), el QR del certificado de Camila para escanear, "Para mostrar además" (perfil completo, cómo comparte una profesional, métricas), "Entrar como…" y "Reiniciar los datos de la demo".
+- `/demo/bandeja`: los mails en pantalla. Cada mail se muestra aislado del sitio (sin scripts) y sus links abren en la misma pestaña, como desde el mail.
+- Prueba de punta a punta del recorrido completo (`tests/e2e/demo.spec.ts`).
+- **Para escanear el QR con un celular, el sitio tiene que estar publicado** (`APP_URL` con un dominio): con la demo en una compu (`localhost`), el celular no llega. La guía lo avisa y ofrece abrir la verificación en la compu.
+
 ## Falta (en este orden)
 
-6. **Demo:**
-   - `/demo`: guía del recorrido de 2 minutos, accesos rápidos y reiniciar.
-   - `/demo/bandeja`: los mails en pantalla.
 7. **Revisión final:**
    - Privacidad y permisos.
    - Accesibilidad.
@@ -127,6 +131,11 @@ Todo lo de producto está en `docs/producto.md`, el modelo en `docs/modelo-de-da
      - Netlify: su integración con Next 16 no está verificada.
    - Variables de entorno.
    - Ambientes separados para demo y piloto.
+
+## Para confirmar con el cliente (surgió en las etapas 3 a 6)
+
+- **Sumar un certificado de otro mail:** si a una profesional con cuenta le llega por error el link de otra persona, podría sumarlo. Hoy el perfil lo muestra con "A nombre de …". Alternativa más estricta: exigir que el nombre coincida (complica a quien cambió de apellido).
+- **El link que la institución copia para WhatsApp es una llave de entrada** hasta que la profesional activa: sirve una vez, vence a los 45 días y deja de servir al activar. Conviene que las instituciones no lo manden a grupos.
 
 ## Decisiones aplicadas por defecto (pendientes de confirmación del cliente)
 

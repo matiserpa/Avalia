@@ -120,6 +120,10 @@ Son las recomendaciones del análisis inicial, aplicadas por defecto.
     - Un certificado emitido no se edita: si tiene un error, se anula (con motivo, que no se muestra en público).
     - La egresada vuelve a quedar "sin emitir", se corrige y se emite otro.
 
+11. **Un link de activación sirve para entrar sólo hasta que el certificado queda en una cuenta.** Después se entra con el código por mail. Así un link viejo (por ejemplo, uno mandado por WhatsApp) no abre la cuenta de nadie. Al borrar la cuenta, los links sin usar de sus certificados también se anulan.
+12. **Si el nombre de un certificado no coincide con el del perfil, el perfil lo muestra: "A nombre de …".** Cubre un cambio de apellido y el caso de alguien que sumó un certificado ajeno.
+13. **Las métricas no cuentan a los programas que arman vistas previas de links** (WhatsApp, Instagram, buscadores). Se mira el navegador en el momento y no se guarda.
+
 ## Reglas de privacidad (Ley 25.326)
 
 - Consentimiento explícito al activar la cuenta: casilla sin marcar, con links a términos y privacidad. Se guarda la fecha y la versión de los textos.

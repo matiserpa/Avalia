@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sella
 
-## Getting Started
+Certificados verificables y perfil profesional para la estética. Las instituciones emiten
+certificados con código y QR; cada profesional reúne su formación en un perfil para compartir;
+cualquiera la verifica en segundos, sin crear cuenta.
 
-First, run the development server:
+Es un prototipo y piloto de Impulso Creativo (3 meses en la Patagonia, con dos instituciones).
+
+## Para empezar
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+echo "DEMO_MODE=true" > .env.local   # datos de prueba, bandeja de mails y accesos rápidos
+npm run dev                           # http://localhost:3000 → la guía de la demo está en /demo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No hace falta instalar una base de datos: sin `DATABASE_URL` se usa PGlite, un Postgres que corre
+dentro de Node. `npm run demo:reiniciar` (con el servidor apagado) vuelve todo al inicio.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Documentación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `docs/estado.md`: qué está hecho, qué falta y qué hay que confirmar. **Empezá por acá.**
+- `docs/producto.md`: qué es, pantallas, flujos, decisiones, privacidad y tono.
+- `docs/modelo-de-datos.md`: las tablas y por qué.
+- `docs/arquitectura.md`: stack, carpetas, reglas de Next 16, permisos, diseño y cómo correrlo.
 
-## Learn More
+## Antes de subir cambios
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run typecheck && npm run lint && npm test   # tipos, estilo y pruebas de lógica
+npm run test:e2e                                # pruebas de punta a punta (celular y escritorio)
+```
