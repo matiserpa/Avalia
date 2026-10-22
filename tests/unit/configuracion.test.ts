@@ -53,7 +53,7 @@ describe('lo que falta configurar', () => {
     vi.stubEnv('AUTH_SECRET', 'corta');
     vi.stubEnv('MAIL_MODE', '');
     expect(faltaConfigurar()).toEqual(['APP_URL', 'AUTH_SECRET', 'MAIL_MODE']);
-    vi.stubEnv('APP_URL', 'https://avalia.example');
+    vi.stubEnv('APP_URL', 'https://avalya.example');
     vi.stubEnv('AUTH_SECRET', 'x'.repeat(32));
     vi.stubEnv('MAIL_MODE', 'resend');
     vi.stubEnv('RESEND_API_KEY', '');

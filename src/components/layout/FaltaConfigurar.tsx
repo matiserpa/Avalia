@@ -9,7 +9,7 @@ import { PaginaPublica } from './EncabezadoPublico';
 const VARIABLES: Partial<Record<Faltante, React.ReactNode>> = {
   APP_URL: (
     <>
-      <Codigo>APP_URL</Codigo>: la dirección pública del sitio, por ejemplo https://avalia.com.ar.
+      <Codigo>APP_URL</Codigo>: la dirección pública del sitio, por ejemplo https://avalya.com.ar.
     </>
   ),
   AUTH_SECRET: (

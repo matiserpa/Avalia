@@ -9,7 +9,7 @@ export function urlBase(): string {
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   const url = process.env.APP_URL || (modoDemo() && vercel ? `https://${vercel}` : '');
   if (!url && process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
-    throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://avalia.com.ar');
+    throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://avalya.com.ar');
   }
   return (url || 'http://localhost:3000').replace(/\/+$/, '');
 }

@@ -33,7 +33,7 @@ Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice q
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
-**En el iPhone, como una app.** Abrir la dirección en Safari, tocar el botón de compartir y elegir **Agregar a inicio**. Queda el ícono de Avalia en la pantalla de inicio y se abre sin la barra del navegador (`src/app/manifest.ts` y `src/app/apple-icon.tsx`). En Android, desde Chrome: menú y **Agregar a la pantalla principal**. La sesión de la app es aparte de la de Safari: la primera vez hay que entrar de nuevo.
+**En el iPhone, como una app.** Abrir la dirección en Safari, tocar el botón de compartir y elegir **Agregar a inicio**. Queda el ícono de Avalya en la pantalla de inicio y se abre sin la barra del navegador (`src/app/manifest.ts` y `src/app/apple-icon.tsx`). En Android, desde Chrome: menú y **Agregar a la pantalla principal**. La sesión de la app es aparte de la de Safari: la primera vez hay que entrar de nuevo.
 
 Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
 
@@ -42,13 +42,13 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
 ## Antes del primer despliegue (una sola vez)
 
 1. **Dominio.** Es el que va impreso en los QR para siempre: después no se cambia.
-   - `.com.ar` en NIC Argentina: $ 8.500 por año (Resolución SLyT 5/2024; confirmar si se actualizó). Se tramita por TAD con CUIT o CUIL y clave fiscal nivel 2. Conviene que quede a nombre de la empresa titular de Avalia.
+   - `.com.ar` en NIC Argentina: $ 8.500 por año (Resolución SLyT 5/2024; confirmar si se actualizó). Se tramita por TAD con CUIT o CUIL y clave fiscal nivel 2. Conviene que quede a nombre de la empresa titular de Avalya.
    - Si más adelante se compra un `.com`, **hay que seguir renovando el `.com.ar`** y redirigirlo, para que los QR viejos sigan funcionando.
 2. **Marca en el INPI.** Desde mayo de 2026 el arancel se mide en UMAPI. Una clase con hasta 20 productos o servicios cuesta 100 UMAPI: unos $ 41.000 a 42.000 en octubre y noviembre de 2026 (confirmar). Los honorarios del agente van aparte.
    - Clase principal: **42**, software como servicio.
    - Conviene sumar la **35** (directorio y verificación de datos) y la **41** (formación); validar con un agente de marcas.
    - Desde el 1/3/2026 el INPI ya no busca marcas parecidas por su cuenta: hay que vigilar el Boletín de Marcas.
-3. **Datos personales (AAIP).** La base de Avalia tiene que inscribirse en el Registro Nacional de Bases de Datos (Ley 25.326, artículo 21). Es gratis y no vence; se hace por TAD. Primero se inscribe la responsable (la empresa) y después la base. **Hacerlo antes de que entren personas reales.**
+3. **Datos personales (AAIP).** La base de Avalya tiene que inscribirse en el Registro Nacional de Bases de Datos (Ley 25.326, artículo 21). Es gratis y no vence; se hace por TAD. Primero se inscribe la responsable (la empresa) y después la base. **Hacerlo antes de que entren personas reales.**
 4. **Textos legales.** Que el abogado revise `/terminos` y `/privacidad` y complete lo marcado como [COMPLETAR]. Si los textos cambian, subir `VERSION_LEGALES` en `src/lib/legales.ts`.
 5. **Logo de la marca.** Reemplazar `src/components/marca/Logo.tsx`. El nombre ya está en `src/config/marca.ts`.
 
@@ -68,7 +68,7 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
   Las migraciones están en `/drizzle` y se aplican en orden; cada una corre una sola vez (Drizzle lleva la cuenta en la base).
 - **Copias propias.** Además de los backups de Supabase, un `pg_dump` semanal guardado fuera de Supabase:
   ```bash
-  pg_dump "<cadena en modo sesión>" --no-owner --format=custom -f avalia-$(date +%F).dump
+  pg_dump "<cadena en modo sesión>" --no-owner --format=custom -f avalya-$(date +%F).dump
   ```
 - **Demo:** otro proyecto. Para cargar los datos de prueba:
   ```bash
@@ -85,7 +85,7 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
    - **DKIM:** un TXT con la clave.
    - **DMARC:** un TXT. Resend lo marca opcional, pero sin él más mails caen en spam: ponerlo.
 3. Esperar la verificación (suele tardar unos 15 minutos).
-4. Variables: `MAIL_MODE=resend`, `RESEND_API_KEY` y `MAIL_FROM="Avalia <hola@mail.<dominio>>"`.
+4. Variables: `MAIL_MODE=resend`, `RESEND_API_KEY` y `MAIL_FROM="Avalya <hola@mail.<dominio>>"`.
 
 **Límites:** el plan gratis manda 3.000 mails por mes y **100 por día**. Una emisión de más de ~90 certificados en un día (un congreso, por ejemplo) se pasa del tope. Los mails que no salen quedan marcados "No le llegó el mail" en el panel de la institución, que puede reenviarlos. Para emisiones grandes, el plan Pro (US$ 20 por mes, 50.000 mails, sin tope diario). El código manda por lotes de 100 (`src/lib/correo/enviar.ts`), que es el máximo de Resend por pedido.
 
@@ -114,7 +114,7 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
 | `ADMIN_EMAILS` | Mails de Impulso, separados por coma | (opcional) | Quién entra a `/admin`. En la demo, `admin@demo.example` ya es admin. |
 | `MAIL_MODE` | `resend` | `bandeja` | En el piloto es obligatorio `resend`: si falta o dice otra cosa, el sitio no manda mails y muestra un error (así nunca guarda en la base mails con códigos o links). |
 | `RESEND_API_KEY` | La clave de Resend | — | |
-| `MAIL_FROM` | `Avalia <hola@mail.<dominio>>` | — | |
+| `MAIL_FROM` | `Avalya <hola@mail.<dominio>>` | — | |
 | `DEMO_MODE` | `false` | `true` | **Nunca `true` en el piloto.** |
 
 **Ojo con `AUTH_SECRET`:** cambiarlo cierra todas las sesiones y **deja sin efecto los links de activación que ya se mandaron** (se guardan firmados con ese secreto). Si hubiera que rotarlo durante el piloto, después reenviar los mails desde el panel de cada institución a quienes no activaron.
@@ -123,7 +123,7 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
 
 1. Crear los dos proyectos de Supabase (piloto y demo) en São Paulo y copiar las cadenas de conexión.
 2. Migrar las dos bases (`npm run db:migrar`) y cargar la demo (`npm run demo:reiniciar`), como se explica arriba.
-3. Crear en Vercel dos proyectos desde el mismo repositorio: `avalia` (piloto) y `avalia-demo`. Cargar las variables de la tabla en cada uno.
+3. Crear en Vercel dos proyectos desde el mismo repositorio: `avalya` (piloto) y `avalya-demo`. Cargar las variables de la tabla en cada uno.
 4. Conectar los dominios: el definitivo al piloto y `demo.<dominio>` a la demo.
 5. Configurar Resend con el dominio (sólo el piloto).
 6. Desplegar. En el piloto, entrar a `/ingresar` con un mail de `ADMIN_EMAILS`: tiene que llegar el código.
