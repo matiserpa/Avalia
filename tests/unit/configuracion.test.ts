@@ -1,7 +1,7 @@
 // Configuración del sitio publicado: la cadena de la base y lo que falta configurar.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { urlDeLaBase } from '@/db';
+import { directorioPglite, urlDeLaBase } from '@/db';
 import { faltaConfigurar } from '@/lib/config';
 
 afterEach(() => {
@@ -33,16 +33,25 @@ describe('lo que falta configurar', () => {
     expect(faltaConfigurar()).toEqual([]);
   });
 
-  it('la demo en Vercel sólo necesita la base', () => {
+  it('la demo en Vercel no necesita nada más: sin base, usa una en memoria', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('VERCEL', '1');
     vi.stubEnv('DEMO_MODE', 'true');
     vi.stubEnv('DATABASE_URL', '');
     vi.stubEnv('POSTGRES_URL', '');
     vi.stubEnv('APP_URL', '');
-    expect(faltaConfigurar()).toEqual(['base']);
-    vi.stubEnv('POSTGRES_URL', 'postgres://u:p@base.example/db');
+    vi.stubEnv('PGLITE_DIR', '');
     expect(faltaConfigurar()).toEqual([]);
+    expect(directorioPglite()).toBe('memory://');
+  });
+
+  it('el piloto en Vercel sin base avisa que falta', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('DEMO_MODE', '');
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('POSTGRES_URL', '');
+    expect(faltaConfigurar()).toContain('base');
   });
 
   it('el piloto necesita la dirección, la clave y los mails por Resend', () => {

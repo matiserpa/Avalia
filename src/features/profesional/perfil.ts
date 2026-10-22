@@ -49,7 +49,7 @@ export function leerFormularioPerfil(fd: FormData): { campos: CamposPerfil; erro
   if (profesionElegida === 'otra' && !campos.profesion) errores.profesion = 'Escribí tu profesión.';
   if (campos.mostrarMatricula && !campos.matricula) errores.matricula = 'Escribí tu matrícula o destildá "Mostrarla en mi perfil".';
   if (campos.contactoTipo === 'whatsapp') {
-    if (!linkWhatsapp(campos.contactoValor)) errores.contactoValor = 'Revisá el número: con código de área, por ejemplo 299 412 3456.';
+    if (!linkWhatsapp(campos.contactoValor)) errores.contactoValor = 'Revisá el número: escribilo con el código de área, sólo con números.';
   } else if (campos.contactoTipo === 'instagram') {
     const u = usuarioInstagram(campos.contactoValor);
     if (!u) errores.contactoValor = 'Revisá el usuario: por ejemplo @tu.usuario.';

@@ -174,6 +174,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 - `/verificar` suma "Cómo leer el resultado" y "Lo que tenés que saber".
 - `INDEXAR`: mientras la dirección sea provisoria no se indexa nada (antes la portada sí).
 - Pruebas: `tests/unit/consultas.test.ts` y `tests/e2e/sitio.spec.ts`.
+- **La demo publicada ya no necesita base:** sin `DATABASE_URL`, con `DEMO_MODE=true`, usa una base en memoria que se arma sola (vuelve al estado inicial cuando Vercel arranca un servidor nuevo). Con Neon conectado, los datos quedan fijos.
 
 ## Para confirmar con el cliente (sitio comercial)
 
@@ -184,7 +185,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 5. **El kit para egresadas y la campaña de inscripción**: ¿se ofrecen en el piloto y cómo se presupuestan? El sitio sólo dice que son opcionales.
 6. **"Verificar es gratis siempre"**: ¿lo asume la agencia por escrito, en los términos?
 7. **El pie propuesto para el PDF** (ver "Para confirmar con el cliente (surgió en la revisión final)").
-8. **Datos de la demo con formato real** ("MP 4821", el WhatsApp de Agustina y el ejemplo "299 412 3456" en el perfil): ¿se cambian por datos claramente ficticios? El sitio comercial ya usa "MP 0000".
+8. ~~Datos de la demo con formato real~~: hecho. Matrícula "MP 0000", Instagram "demo.avalya", Agustina sin contacto y ejemplos de mail con example.com (dominio reservado).
 9. **La frase para la promoción** («Los certificados de nuestros cursos se pueden verificar») vale sólo para los cursos emitidos con Avalya: dejarlo escrito en el acuerdo con cada institución.
 10. **Capacidad para atender** las consultas, las reuniones y las altas de instituciones nuevas durante el piloto.
 11. **Colegios profesionales**: el formulario dice "asociación profesional" para no mezclar a Avalya con quien otorga la matrícula. ¿Son un público buscado?

@@ -61,7 +61,7 @@ export function InvitarAlEquipo({ institucionId, nombre }: { institucionId: stri
         idBase={`invitar-${institucionId}`}
         type="email"
         autoComplete="off"
-        placeholder="nombre@ejemplo.com"
+        placeholder="nombre@example.com"
         defaultValue={estado.email}
         error={estado.ok === false ? estado.mensaje : undefined}
       />

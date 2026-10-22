@@ -72,8 +72,9 @@ export type Faltante = 'base' | 'APP_URL' | 'AUTH_SECRET' | 'MAIL_MODE' | 'RESEN
 export function faltaConfigurar(): Faltante[] {
   if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PHASE === 'phase-production-build') return [];
   const falta: Faltante[] = [];
-  // En Vercel el disco es de sólo lectura: sin una base conectada no puede andar.
-  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.POSTGRES_URL) falta.push('base');
+  // En Vercel el disco es de sólo lectura: el piloto sin una base conectada no puede andar. La
+  // demo sí (usa una base en memoria; ver directorioPglite en src/db/index.ts).
+  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.POSTGRES_URL && !modoDemo()) falta.push('base');
   if (!modoDemo()) {
     if (!process.env.APP_URL) falta.push('APP_URL');
     if ((process.env.AUTH_SECRET ?? '').length < 32) falta.push('AUTH_SECRET');

@@ -29,7 +29,7 @@ function validar(c: CamposEgresada): { errores: ErroresEgresada; datos: CamposEg
   if (!datos.apellido) errores.apellido = 'Escribí el apellido.';
   else if (/\d/.test(datos.apellido)) errores.apellido = MENSAJE_NUMEROS;
   if (!datos.email) errores.email = 'Escribí el mail.';
-  else if (!emailValido(datos.email)) errores.email = 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.';
+  else if (!emailValido(datos.email)) errores.email = 'Revisá el mail: tiene que tener una @ y terminar en algo como .com o .com.ar.';
   return { errores, datos };
 }
 

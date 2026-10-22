@@ -6,7 +6,7 @@ test.describe('perfil público', () => {
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Valentina Ríos');
     await expect(page.getByText('4 certificados verificados')).toBeVisible();
     // Lo declarado no lleva sello: la matrícula se rotula como declarada.
-    await expect(page.getByText('Matrícula MP 4821')).toBeVisible();
+    await expect(page.getByText('Matrícula MP 0000')).toBeVisible();
     await expect(page.getByText('declarada', { exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: /^Verificar el certificado de/ })).toHaveCount(4);
     await page.getByRole('link', { name: 'Verificar el certificado de Masterclass Demo: Peelings químicos' }).click();

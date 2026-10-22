@@ -46,7 +46,7 @@ export async function solicitarCodigo(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const email = normalizarEmail(emailCrudo);
   if (!email) return { ok: false, error: 'Escribí tu mail.' };
-  if (!emailValido(email)) return { ok: false, error: 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.' };
+  if (!emailValido(email)) return { ok: false, error: 'Revisá el mail: tiene que tener una @ y terminar en algo como .com o .com.ar.' };
   await programar(() => mandarCodigo(email));
   return { ok: true };
 }

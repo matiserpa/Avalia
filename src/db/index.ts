@@ -65,8 +65,10 @@ const PARAMETROS_AJENOS = [
   'tcp_user_timeout',
 ];
 
+// En Vercel el disco es de sólo lectura: la demo sin base conectada usa una base en memoria, que
+// arranca vacía en cada instancia (instrumentation.ts la arma con los datos de prueba).
 export function directorioPglite() {
-  return process.env.PGLITE_DIR || '.data/pglite';
+  return process.env.PGLITE_DIR || (process.env.VERCEL ? 'memory://' : '.data/pglite');
 }
 
 function crearDb(): Db {

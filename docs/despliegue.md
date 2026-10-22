@@ -18,18 +18,21 @@ Costo mensual aproximado del piloto: **US$ 45 a 65** (Vercel US$ 20 + Supabase U
 
 **Regla de oro:** la demo y el piloto nunca comparten base de datos, `AUTH_SECRET` ni dominio. En la demo cualquiera puede entrar como cualquiera (`/demo/entrar`) y el botón "Reiniciar los datos" **borra todo**.
 
-## La demo en la web, en 10 minutos
+## La demo en la web, en 5 minutos
 
-Para verla desde cualquier navegador o celular, sin instalar nada. Con `DEMO_MODE=true` la demo se arma sola al arrancar: crea las tablas y carga los datos de prueba. Si falta `APP_URL`, toma la dirección que Vercel le da al proyecto.
+Para verla desde cualquier navegador o celular, sin instalar nada. Con `DEMO_MODE=true` la demo se arma sola al arrancar: crea las tablas y carga los datos de prueba (todos inventados). Si falta `APP_URL`, toma la dirección que Vercel le da al proyecto.
 
 1. En [vercel.com/new](https://vercel.com/new), entrar con la cuenta de GitHub e importar el repositorio `matiserpa/Avalia`.
-2. Antes de tocar **Deploy**, en **Environment Variables**, agregar `DEMO_MODE` = `true`.
-3. Tocar **Deploy**. La compilación termina bien, pero el sitio todavía no anda: muestra la pantalla "Falta terminar de configurar el sitio", porque falta la base de datos.
-4. En el proyecto, ir a **Storage**, crear una base **Neon** (Postgres) y conectarla al proyecto. Elegir la región São Paulo si aparece. Vercel carga sola la variable `DATABASE_URL`. Una base de Supabase conectada desde el mismo menú también sirve: carga `POSTGRES_URL`, que el código también lee.
-5. En **Deployments**, volver a desplegar el último (**Redeploy**).
-6. Abrir `https://<el-proyecto>.vercel.app/demo`. La primera carga tarda unos segundos más, mientras arma la base.
+2. En **Environment Variables**, agregar `DEMO_MODE` = `true`. Si el proyecto ya existe: **Settings → Environment Variables**.
+3. Tocar **Deploy** (o **Deployments → Redeploy** si ya existía).
+4. Abrir `https://<el-proyecto>.vercel.app/demo`. La primera carga tarda unos segundos más, mientras arma la base.
 
-Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice qué falta (sin mostrar ningún valor). Las dos causas habituales son que no haya una base conectada o que falte `DEMO_MODE`; después de corregirlo hay que volver a desplegar. Si la primera carga da error, se recarga la página. Si los datos quedan raros, se usa el botón **Reiniciar los datos de la demo** de `/demo`.
+**Sin base conectada, los datos viven en la memoria del servidor.** Alcanza para mostrar la demo, pero vuelven al estado inicial cada vez que Vercel arranca un servidor nuevo: después de un rato sin visitas, con cada despliegue y, a veces, con mucho tráfico (cada servidor tiene su copia). Para una demo con datos que no se reinicien:
+
+5. En el proyecto, ir a **Storage**, crear una base **Neon** (Postgres) y conectarla al proyecto. Elegir la región São Paulo si aparece. Vercel carga sola la variable `DATABASE_URL`. Una base de Supabase conectada desde el mismo menú también sirve: carga `POSTGRES_URL`, que el código también lee.
+6. En **Deployments**, volver a desplegar el último (**Redeploy**).
+
+Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice qué falta (sin mostrar ningún valor). En la demo, la causa habitual es que falte `DEMO_MODE`; después de corregirlo hay que volver a desplegar. Si la primera carga da error, se recarga la página. Si los datos quedan raros, se usa el botón **Reiniciar los datos de la demo** de `/demo`.
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
@@ -44,7 +47,7 @@ La dirección anterior sigue andando. Cuando llegue el dominio propio, se cambia
 
 Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
 
-Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 y sin `APP_URL`: la demo se armó sola y pasaron las 47 pruebas de punta a punta. También con una cadena como la de Neon (con `channel_binding`) y con tres copias del servidor arrancando a la vez sobre la base vacía: las tres respondieron y los datos se cargaron una sola vez.
+Probado el 22/10/2026 con la compilación de producción: como en Vercel sin base (en memoria) pasaron las 71 pruebas de punta a punta; contra un Postgres 16 y sin `APP_URL`, la demo se armó sola. También con una cadena como la de Neon (con `channel_binding`) y con tres copias del servidor arrancando a la vez sobre la base vacía: las tres respondieron y los datos se cargaron una sola vez.
 
 ## Antes del primer despliegue (una sola vez)
 

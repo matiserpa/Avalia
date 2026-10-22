@@ -242,7 +242,7 @@ function Contacto({ tipoInicial, valorInicial, error }: { tipoInicial: ValoresPe
           autoComplete="tel"
           defaultValue={tipoInicial === 'whatsapp' ? valorInicial : ''}
           error={error}
-          ayuda="Con código de área. Por ejemplo: 299 412 3456."
+          ayuda="Con código de área, sin el 0 ni el 15."
         />
       )}
       {tipo === 'instagram' && (

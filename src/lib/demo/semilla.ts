@@ -175,10 +175,11 @@ export async function cargarDemo(): Promise<void> {
     apellido: 'Ríos',
     profesion: 'Cosmiatra',
     ciudad: 'Neuquén',
-    matricula: 'MP 4821',
+    // Datos claramente ficticios: ni la matrícula ni el usuario pueden ser de una persona real.
+    matricula: 'MP 0000',
     mostrarMatricula: true,
     contactoTipo: 'instagram',
-    contactoValor: 'valentina.cosmiatra.demo',
+    contactoValor: 'demo.avalya',
     publico: true,
     publicadoEn: haceDias(39),
   });
@@ -208,8 +209,7 @@ export async function cargarDemo(): Promise<void> {
     apellido: 'Molina',
     profesion: 'Dermatocosmiatra',
     ciudad: 'General Roca',
-    contactoTipo: 'whatsapp',
-    contactoValor: '298 4123456',
+    // Sin contacto: un número de WhatsApp inventado podría ser de alguien.
     publico: true,
     publicadoEn: haceDias(24),
   });

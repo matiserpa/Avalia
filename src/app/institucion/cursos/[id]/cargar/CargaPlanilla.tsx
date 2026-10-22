@@ -13,8 +13,8 @@ import { cantidad } from '@/lib/texto';
 import { confirmarCarga, revisarPlanilla, type EstadoPlanilla } from '../../../acciones';
 
 const EJEMPLO = `Nombre\tApellido\tMail
-Camila\tSosa\tcamila@ejemplo.com
-Lucía\tNavarro\tlucia@ejemplo.com`;
+Camila\tSosa\tcamila@example.com
+Lucía\tNavarro\tlucia@example.com`;
 
 export function CargaPlanilla({ cursoId }: { cursoId: string }) {
   const [estado, enviar] = useActionState<EstadoPlanilla, FormData>(revisarPlanilla, { paso: 'pegar' });

@@ -48,7 +48,7 @@ export type ErroresInstitucion = Partial<Record<'nombre' | 'ciudad' | 'logo' | '
 // ¿Se puede sumar este mail al equipo de una institución?
 async function problemaConEmail(email: string, institucionId?: string): Promise<string | null> {
   if (!email) return 'Escribí el mail.';
-  if (!emailValido(email)) return 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.';
+  if (!emailValido(email)) return 'Revisá el mail: tiene que tener una @ y terminar en algo como .com o .com.ar.';
   if (esEmailAdmin(email)) return 'Ese mail es de la administración. Usá otro.';
   const [u] = await db
     .select({ institucionId: usuarios.institucionId, acepto: usuarios.aceptoLegalesEn, perfil: perfiles.usuarioId })
