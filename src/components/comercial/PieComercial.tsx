@@ -33,7 +33,7 @@ export function PieComercial() {
             <p className="mt-3 max-w-xs text-[0.9375rem] text-tinta-suave">{MARCA.descripcion}</p>
             <p className="mt-2 text-[0.9375rem] text-tinta-suave">Piloto en Neuquén y Río Negro.</p>
           </div>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-x-6 gap-y-6 md:grid-cols-[repeat(3,minmax(0,1fr))_auto]">
             {GRUPOS.map((g) => (
               <nav key={g.titulo} aria-label={g.titulo}>
                 <p className="text-[0.9375rem] font-bold">{g.titulo}</p>
@@ -54,7 +54,7 @@ export function PieComercial() {
                 <li>
                   <a
                     href={`mailto:${MARCA.emailContacto}`}
-                    className="flex min-h-12 items-center text-[0.9375rem] [overflow-wrap:anywhere] text-tinta-suave underline-offset-4 hover:text-tinta hover:underline"
+                    className="flex min-h-12 items-center text-[0.9375rem] text-tinta-suave max-md:[overflow-wrap:anywhere] underline-offset-4 hover:text-tinta hover:underline"
                   >
                     {MARCA.emailContacto}
                   </a>

@@ -13,6 +13,25 @@ test.describe('sitio comercial', () => {
     }
   });
 
+  test('a 320 px tampoco se corre de costado', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    for (const ruta of PAGINAS) {
+      await page.goto(ruta);
+      const ancho = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(ancho, `${ruta} se corre de costado a 320 px`).toBeLessThanOrEqual(0);
+    }
+  });
+
+  test('las muestras se leen pero no tienen nada que tocar', async ({ page }) => {
+    for (const ruta of ['/', '/profesionales']) {
+      await page.goto(ruta);
+      const tocables = page.locator('[data-muestra] :is(a, button, input, select, textarea, summary, [tabindex])');
+      await expect(tocables).toHaveCount(0);
+    }
+    await page.goto('/');
+    await expect(page.getByRole('figure').filter({ hasText: 'Certificado válido' })).toBeVisible();
+  });
+
   test('el verde aparece sólo en las muestras de lo verificado', async ({ page }) => {
     for (const ruta of PAGINAS) {
       await page.goto(ruta);
@@ -44,6 +63,13 @@ test.describe('sitio comercial', () => {
     await page.keyboard.press('Escape');
     await expect(menu).toBeHidden();
     await expect(boton).toBeFocused();
+    // Con el menú abierto, Escape en otro lado (un campo) no lo cierra ni se lleva el foco.
+    await boton.click();
+    await page.getByLabel('Código del certificado').focus();
+    await page.keyboard.press('Escape');
+    await expect(page.getByLabel('Código del certificado')).toBeFocused();
+    await expect(menu).toBeVisible();
+    await page.getByRole('button', { name: 'Cerrar' }).click();
     // Elegir una opción lo cierra y lleva a la página.
     await boton.click();
     await menu.getByRole('link', { name: 'Para profesionales' }).click();

@@ -1,6 +1,7 @@
 // Muestras del sitio comercial: piezas de la plataforma armadas con sus componentes reales y los
 // datos fijos de src/features/comercial/muestras.ts. Son ilustraciones: van en un <figure> con su
-// leyenda, sin títulos adentro y sin nada que se pueda tocar (`inert`).
+// leyenda, sin títulos adentro y sin nada que se pueda tocar (sin links, botones ni campos: una
+// prueba de punta a punta lo controla). No llevan `inert`: así el lector de pantalla las lee.
 
 import { TarjetaValido } from '@/components/certificados/Resultado';
 import { Isotipo } from '@/components/marca/Logo';
@@ -32,7 +33,7 @@ export function Muestra({
 }) {
   return (
     <figure className={className} data-muestra>
-      <div inert className="select-none">
+      <div className="select-none">
         {children}
       </div>
       <figcaption className="mt-3 text-[0.875rem] text-tinta-suave">{leyenda}</figcaption>

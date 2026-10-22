@@ -16,11 +16,13 @@ export function Isotipo({ className = 'size-8' }: { className?: string }) {
 }
 
 // Logo completo: isotipo + nombre. `compacto` muestra el nombre corto (encabezados en celular).
-export function Logo({ compacto = false, className = '' }: { compacto?: boolean; className?: string }) {
+// `angosto`: en pantallas de menos de 400 px queda sólo el isotipo; el nombre sigue para el
+// lector de pantalla (encabezados con varios botones al lado).
+export function Logo({ compacto = false, angosto = false, className = '' }: { compacto?: boolean; angosto?: boolean; className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2.5 text-tierra ${className}`}>
       <Isotipo className="size-8 shrink-0" />
-      <span className="text-[1.0625rem] font-bold tracking-tight text-tinta">
+      <span className={`text-[1.0625rem] font-bold tracking-tight text-tinta ${angosto ? 'max-[399px]:sr-only' : ''}`}>
         {compacto ? (
           <>
             <span className="sm:hidden">{MARCA.nombreCorto}</span>

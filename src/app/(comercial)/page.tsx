@@ -129,19 +129,34 @@ function BotonSumar() {
   );
 }
 
-// Una pantalla real de la plataforma, recortada (sin mails ni encabezado).
-function Captura({ src, ancho, alto, alt }: { src: string; ancho: number; alto: number; alt: string }) {
+// Una pantalla real de la plataforma, recortada (sin mails ni encabezado). `celular`: otro recorte
+// para pantallas angostas, donde el de escritorio se vería con letra diminuta.
+function Captura({
+  src,
+  ancho,
+  alto,
+  alt,
+  celular,
+}: {
+  src: string;
+  ancho: number;
+  alto: number;
+  alt: string;
+  celular?: { src: string; ancho: number; alto: number };
+}) {
   return (
     <figure>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        width={ancho}
-        height={alto}
-        alt={alt}
-        loading="lazy"
-        className="h-auto w-full rounded-2xl border border-borde-suave bg-marfil shadow-elevada"
-      />
+      <picture>
+        {celular && <source media="(max-width: 639px)" srcSet={celular.src} width={celular.ancho} height={celular.alto} />}
+        <img
+          src={src}
+          width={ancho}
+          height={alto}
+          alt={alt}
+          loading="lazy"
+          className="h-auto w-full rounded-2xl border border-borde-suave bg-marfil shadow-elevada"
+        />
+      </picture>
       <figcaption className="mt-3 text-[0.875rem] text-tinta-suave">Pantalla real de {MARCA.nombre}, con datos inventados.</figcaption>
     </figure>
   );
@@ -363,7 +378,8 @@ export default async function Portada({ searchParams }: PageProps<'/'>) {
             src="/comercial/emitir-congreso.webp"
             ancho={EMITIR.ancho}
             alto={EMITIR.alto}
-            alt="Pantalla para emitir los certificados del Congreso Demo 2026: el botón Emitir 5 certificados y lo que pasa al emitir."
+            celular={{ src: '/comercial/emitir-congreso-celular.webp', ...EMITIR_CELULAR }}
+            alt="Pantalla para emitir los certificados del Congreso Demo 2026: el título Emitir 5 certificados y lo que pasa al emitir. Cada asistente recibe su certificado con código y QR, le mandamos un mail para activar su pasaporte, y un certificado emitido no se edita."
           />
         </div>
       </section>
@@ -404,6 +420,7 @@ export default async function Portada({ searchParams }: PageProps<'/'>) {
 // Tamaños de las capturas de public/comercial (para reservar el lugar antes de que carguen).
 const RESUMEN = { ancho: 1056, alto: 642 };
 const EMITIR = { ancho: 1440, alto: 882 };
+const EMITIR_CELULAR = { ancho: 780, alto: 1088 };
 
 function PiezaMuestra({
   titulo,

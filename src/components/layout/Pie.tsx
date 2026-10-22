@@ -8,17 +8,17 @@ export function Pie({ className = '' }: { className?: string }) {
         <p>
           {MARCA.nombre} · un servicio de {MARCA.responsable}
         </p>
-        <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5 gap-y-2">
-          <Link href="/" className="underline-offset-4 hover:underline">
+        <nav aria-label="Pie de página" className="flex flex-wrap gap-x-5">
+          <Link href="/" className="inline-flex min-h-12 items-center underline-offset-4 hover:underline">
             Para instituciones
           </Link>
-          <Link href="/verificar" className="underline-offset-4 hover:underline">
+          <Link href="/verificar" className="inline-flex min-h-12 items-center underline-offset-4 hover:underline">
             Verificar un certificado
           </Link>
-          <Link href="/terminos" className="underline-offset-4 hover:underline">
+          <Link href="/terminos" className="inline-flex min-h-12 items-center underline-offset-4 hover:underline">
             Términos
           </Link>
-          <Link href="/privacidad" className="underline-offset-4 hover:underline">
+          <Link href="/privacidad" className="inline-flex min-h-12 items-center underline-offset-4 hover:underline">
             Privacidad
           </Link>
         </nav>

@@ -45,15 +45,18 @@ export function EncabezadoSitio({
 
   useEffect(() => {
     if (!abierto) return;
+    // Sólo si el foco está en el menú o en su botón: el menú no es modal y puede quedar abierto
+    // mientras se completa un formulario, donde Escape cierra las sugerencias del navegador.
     const alTeclear = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      const enElMenu = document.getElementById(idMenu)?.contains(document.activeElement) || document.activeElement === boton.current;
+      if (e.key === 'Escape' && enElMenu) {
         setAbiertoEn(null);
         boton.current?.focus();
       }
     };
     document.addEventListener('keydown', alTeclear);
     return () => document.removeEventListener('keydown', alTeclear);
-  }, [abierto]);
+  }, [abierto, idMenu]);
 
   // Sólo las páginas: un link a una sección (/#congresos) no es "la página actual".
   const actual = (href: string) => (href.includes('#') ? undefined : pathname === href ? 'page' : undefined);
@@ -61,8 +64,8 @@ export function EncabezadoSitio({
   return (
     <header className="no-imprimir relative z-30">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-3 sm:px-6 sm:py-5">
-        <Link href="/" className="shrink-0 rounded-lg">
-          <Logo compacto />
+        <Link href="/" className="inline-flex min-h-12 shrink-0 items-center rounded-lg">
+          <Logo compacto angosto />
           <span className="sr-only">, ir a la portada</span>
         </Link>
 
@@ -83,7 +86,7 @@ export function EncabezadoSitio({
             <Icono nombre="lupa" />
             Verificar
           </Link>
-          <Link href={ingresar.href} className={`${ENLACE} hidden border border-borde px-4 min-[1152px]:inline-flex`}>
+          <Link href={ingresar.href} className={`${ENLACE} hidden border border-borde px-4 lg:inline-flex`}>
             {ingresar.texto}
           </Link>
           {conLlamado && (
@@ -109,7 +112,8 @@ export function EncabezadoSitio({
         <nav aria-label="Menú" className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
           <ul className="grid gap-1">
             {[...enlacesMenu, ingresar].map((e) => (
-              <li key={e.href}>
+              // Ingresar está en la fila desde 1024 px: en el menú, sólo hasta ahí.
+              <li key={e.href} className={e === ingresar ? 'lg:hidden' : undefined}>
                 <Link
                   href={e.href}
                   aria-current={actual(e.href)}
