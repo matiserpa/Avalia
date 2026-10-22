@@ -13,6 +13,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: MARCA.nombre, template: `%s · ${MARCA.nombre}` },
     description: MARCA.descripcion,
     applicationName: MARCA.nombre,
+    // Agregado a la pantalla de inicio del iPhone se abre como app (ver src/app/manifest.ts).
+    appleWebApp: { capable: true, title: MARCA.nombreCorto, statusBarStyle: 'default' },
     // Durante el piloto nada se indexa en buscadores salvo la portada (que lo habilita en su
     // página): los perfiles y verificaciones se comparten por link, no se buscan en Google.
     robots: { index: false, follow: false },

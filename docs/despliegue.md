@@ -33,6 +33,8 @@ Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice q
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
+**En el iPhone, como una app.** Abrir la dirección en Safari, tocar el botón de compartir y elegir **Agregar a inicio**. Queda el ícono de Avalia en la pantalla de inicio y se abre sin la barra del navegador (`src/app/manifest.ts` y `src/app/apple-icon.tsx`). En Android, desde Chrome: menú y **Agregar a la pantalla principal**. La sesión de la app es aparte de la de Safari: la primera vez hay que entrar de nuevo.
+
 Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
 
 Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 y sin `APP_URL`: la demo se armó sola y pasaron las 47 pruebas de punta a punta. También con una cadena como la de Neon (con `channel_binding`) y con tres copias del servidor arrancando a la vez sobre la base vacía: las tres respondieron y los datos se cargaron una sola vez.

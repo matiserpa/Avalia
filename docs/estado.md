@@ -164,6 +164,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 - `docs/despliegue.md`: Supabase (pooler en modo transacción, puerto 6543; migraciones por el puerto 5432), Resend con dominio propio (SPF, DKIM y DMARC; tope de 100 mails por día en el plan gratis), Vercel Pro en São Paulo, variables de entorno, ambientes separados de demo y piloto, primer despliegue paso a paso, costos y mantenimiento.
 - `vercel.json` con la región `gru1`, `engines` en `package.json` y límite de 4 MB por imagen en el servidor. Los SVG se aceptan sólo para logos y siempre se convierten a WebP.
 - Primer despliegue real de la demo (proyecto `avalia-demo` en Vercel): sin base conectada mostraba un error genérico en inglés. Ahora, si falta configuración, todas las páginas muestran "Falta terminar de configurar el sitio" con lo que falta (`faltaConfigurar` en `src/lib/config.ts`). Además se corrigieron dos fallas que iban a aparecer al conectar Neon: su cadena trae `channel_binding`, que Postgres rechaza, y dos copias arrancando juntas chocaban al armar la base (ahora hay un candado). Pruebas en `tests/unit/configuracion.test.ts`.
+- Se puede agregar a la pantalla de inicio del celular y se abre como app: ícono propio (`src/components/marca/IconoApp.tsx`), `src/app/manifest.ts` y `src/app/apple-icon.tsx`. Cómo hacerlo, en `docs/despliegue.md`.
 
 ## Falta
 
