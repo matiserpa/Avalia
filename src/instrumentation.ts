@@ -8,7 +8,8 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== 'nodejs') return;
   if (process.env.NEXT_PHASE === 'phase-production-build') return;
-  const demo = process.env.DEMO_MODE === 'true';
+  const { modoDemo } = await import('./lib/config');
+  const demo = modoDemo();
   const hayBase = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
   if (hayBase && !demo) return;
   // El piloto en Vercel sin DATABASE_URL no puede andar (cada instancia tendría su propia base).

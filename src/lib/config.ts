@@ -16,8 +16,18 @@ export function urlBase(): string {
 
 // Modo demo: bandeja de mails en pantalla, accesos rápidos y botón para reiniciar los datos.
 // NUNCA en el ambiente del piloto: cualquiera podría entrar como cualquiera.
+// Se acepta "true" escrito de cualquier forma razonable ("True", " true", con comillas) o "1":
+// en el panel de Vercel es fácil cargarlo así y que la demo no arranque sin que se note por qué.
 export function modoDemo(): boolean {
-  return process.env.DEMO_MODE === 'true';
+  return valorDemo() === 'true' || valorDemo() === '1';
+}
+
+// Lo que llega en DEMO_MODE, limpio (sin espacios ni comillas, en minúsculas). null si no está.
+// No es un secreto: la pantalla de configuración lo muestra para que se vea qué está llegando.
+export function valorDemo(): string | null {
+  const v = process.env.DEMO_MODE;
+  if (v === undefined) return null;
+  return v.trim().replace(/^["']+|["']+$/g, '').trim().toLowerCase();
 }
 
 // 'bandeja': los mails no salen, quedan en la base y se ven en /demo/bandeja (demo y desarrollo).

@@ -2,7 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { directorioPglite, urlDeLaBase } from '@/db';
-import { faltaConfigurar } from '@/lib/config';
+import { faltaConfigurar, modoDemo, valorDemo } from '@/lib/config';
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -69,5 +69,28 @@ describe('lo que falta configurar', () => {
     expect(faltaConfigurar()).toEqual(['RESEND_API_KEY']);
     vi.stubEnv('RESEND_API_KEY', 're_prueba');
     expect(faltaConfigurar()).toEqual([]);
+  });
+});
+
+describe('modo demo', () => {
+  it('acepta true escrito de varias formas, y nada más', () => {
+    for (const v of ['true', 'True', ' TRUE ', '"true"', "'true'", '1']) {
+      vi.stubEnv('DEMO_MODE', v);
+      expect(modoDemo(), v).toBe(true);
+    }
+    for (const v of ['', 'false', 'no', 'verdadero', 'true1']) {
+      vi.stubEnv('DEMO_MODE', v);
+      expect(modoDemo(), v).toBe(false);
+    }
+  });
+
+  it('dice qué valor llega, para la pantalla de configuración', () => {
+    vi.stubEnv('DEMO_MODE', ' "Si" ');
+    expect(valorDemo()).toBe('si');
+    vi.unstubAllEnvs();
+    const antes = process.env.DEMO_MODE;
+    delete process.env.DEMO_MODE;
+    expect(valorDemo()).toBeNull();
+    if (antes !== undefined) process.env.DEMO_MODE = antes;
   });
 });
