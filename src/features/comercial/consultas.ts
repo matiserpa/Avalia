@@ -4,11 +4,15 @@
 //   privacidad y la versión de los textos legales.
 // - Contra el spam: un campo trampa que una persona no ve (si viene lleno, se descarta sin avisar),
 //   un tope de consultas por mail por día (las de más se descartan sin avisar: ya tenemos cómo
-//   responderle) y un tope general por hora.
+//   responderle) y un tope general por hora. No hay tope por IP porque no guardamos IP.
+// - Los avisos por mail también tienen tope por día: salen por la misma cuenta que los códigos
+//   para ingresar y los certificados, y una tanda de consultas falsas no puede agotar ese cupo.
+//   Pasado el tope, las consultas se guardan igual y se ven en /admin/consultas.
 // - En modo demo no se guarda ni se manda nada: el sitio de la demo es público y cualquiera entra
 //   al panel de administración, así que lo que alguien escriba de verdad quedaría a la vista.
 // - El aviso a la agencia sale después de responder (`programar`), para no demorar la respuesta.
-// - Se borran solas a los 12 meses de llegar, como dice la política de privacidad.
+// - Se borran solas a los 12 meses de llegar, como dice la política de privacidad: con la tarea
+//   diaria (src/app/tareas/diaria/route.ts) y, además, al recibir una consulta o abrir el panel.
 
 import 'server-only';
 import { and, count, desc, eq, gt, lt } from 'drizzle-orm';
@@ -23,10 +27,11 @@ import { emailValido, normalizarEmail } from '@/lib/texto';
 
 export const MAXIMOS = { nombre: 120, email: 200, telefono: 40, organizacion: 160, ciudad: 80, mensaje: 2000 } as const;
 const MAX_POR_MAIL_POR_DIA = 3;
-const MAX_POR_HORA = 60;
+const MAX_POR_HORA = 20;
+const MAX_AVISOS_POR_DIA = 10;
 const CONSERVACION_MS = 365 * 24 * 60 * 60 * 1000;
 
-async function borrarVencidas(): Promise<void> {
+export async function borrarVencidas(): Promise<void> {
   await db.delete(consultas).where(lt(consultas.creadaEn, new Date(Date.now() - CONSERVACION_MS)));
 }
 
@@ -153,6 +158,12 @@ export async function recibirConsulta(
     .insert(consultas)
     .values({ ...v.valores, aceptoPrivacidadEn: new Date(ahora), versionLegales: VERSION_LEGALES })
     .returning();
+
+  const [{ enElDia }] = await db
+    .select({ enElDia: count() })
+    .from(consultas)
+    .where(gt(consultas.creadaEn, new Date(ahora - 24 * 60 * 60 * 1000)));
+  if (enElDia > MAX_AVISOS_POR_DIA) return { ok: true, demo: false };
 
   await programar(async () => {
     const envio = await enviarCorreo(

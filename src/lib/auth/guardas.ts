@@ -4,6 +4,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { igualesSeguro } from '@/lib/cripto';
 import { consentimientoVigente } from '@/lib/legales';
 import { COOKIE_SESION, sesionActual, type SesionActual } from './sesion';
 
@@ -31,4 +32,12 @@ export async function requerirAdmin(): Promise<SesionActual> {
   const s = await requerirSesion();
   if (!s.esAdmin) redirect('/ingresar?motivo=sin-permiso');
   return s;
+}
+
+// Tareas programadas (vercel.json, "crons"): Vercel manda `Authorization: Bearer <CRON_SECRET>`.
+// Sin CRON_SECRET definido, nadie pasa.
+export function esTareaProgramada(req: Request): boolean {
+  const secreto = process.env.CRON_SECRET;
+  if (!secreto || secreto.length < 16) return false;
+  return igualesSeguro(req.headers.get('authorization') ?? '', `Bearer ${secreto}`);
 }

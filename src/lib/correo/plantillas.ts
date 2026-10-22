@@ -132,5 +132,5 @@ ${boton('Ver las consultas', d.enlace)}
     '',
     `Ver las consultas: ${d.enlace}`,
   ].join('\n');
-  return { para: d.para, asunto, html, texto, plantilla: 'consulta', responderA: d.email };
+  return { para: d.para, asunto, html, texto, plantilla: 'consulta', responderA: d.email, asuntoRegistro: `Consulta nueva (${d.tipo})` };
 }

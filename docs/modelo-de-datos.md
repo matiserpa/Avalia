@@ -109,8 +109,9 @@ Logos y fotos, achicados a 512 px en WebP y guardados en la base. Se sirven por 
 ### `consultas`
 Lo que llega desde el formulario de contacto del sitio comercial (`/contacto`): tipo (instituto, asociación, congreso, profesional u otro), nombre, mail, teléfono, institución, ciudad y mensaje. Guarda cuándo aceptó el aviso de privacidad y la versión de los textos legales.
 
-- **Se borran solas a los 12 meses** de llegar, como dice la política de privacidad. Desde `/admin/consultas` se marcan como respondidas o se borran antes.
-- **Contra el spam:** un campo trampa invisible, hasta 3 por mail por día y hasta 60 por hora en total.
+- **Se borran solas a los 12 meses** de llegar, como dice la política de privacidad: lo hace una tarea diaria (`vercel.json` → `/tareas/diaria`, con `CRON_SECRET`) y, además, cada vez que llega una consulta o se abre el panel. Desde `/admin/consultas` se marcan como respondidas o se borran antes.
+- **El aviso por mail** lleva los datos y se responde directo a quien escribió, pero en `correos` queda sólo "Consulta nueva (tipo)", sin datos de la persona. Después de 10 avisos en el día, las consultas se guardan sin aviso, para no agotar el cupo de mails que necesitan los códigos de ingreso.
+- **Contra el spam:** un campo trampa invisible, hasta 3 por mail por día y hasta 20 por hora en total.
 - **En modo demo no se guarda nada:** el panel de administración de la demo lo puede abrir cualquiera.
 
 ## Qué se borra al borrar una cuenta

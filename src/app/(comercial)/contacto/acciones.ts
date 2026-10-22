@@ -29,7 +29,9 @@ export async function enviarConsulta(prev: EstadoConsulta, fd: FormData): Promis
     if (r.ok) return { intento, enviada: true, demo: r.demo, tipo: valores.tipo as TipoConsulta };
     return 'errores' in r ? { intento, errores: r.errores, valores } : { intento, error: r.error, valores };
   } catch (e) {
-    console.error('No se pudo guardar una consulta.', e);
+    // Sin el error completo: el de la base trae los valores de la consulta (datos de la persona).
+    const motivo = (e as { cause?: { code?: string } })?.cause?.code ?? (e instanceof Error ? e.name : 'error');
+    console.error('No se pudo guardar una consulta.', motivo);
     return {
       intento,
       valores,

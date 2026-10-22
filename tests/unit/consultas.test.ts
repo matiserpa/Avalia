@@ -7,6 +7,8 @@ import { db } from '@/db';
 import { consultas, correos } from '@/db/schema';
 import { MARCA } from '@/config/marca';
 import { listarConsultas, recibirConsulta, validarConsulta, type DatosConsulta } from '@/features/comercial/consultas';
+import { esTareaProgramada } from '@/lib/auth/guardas';
+import { correoConsulta } from '@/lib/correo/plantillas';
 import { VERSION_LEGALES } from '@/lib/legales';
 
 const base: DatosConsulta = {
@@ -68,8 +70,32 @@ describe('recibir una consulta', () => {
     expect(c).toMatchObject({ tipo: 'instituto', email: 'paula.gomez@demo.example', versionLegales: VERSION_LEGALES });
     expect(c.aceptoPrivacidadEn).toBeInstanceOf(Date);
     const [m] = await db.select().from(correos).where(eq(correos.para, MARCA.emailContacto)).orderBy(desc(correos.creadoEn));
-    expect(m.asunto).toBe('Consulta nueva: Escuela Prueba de Estética');
     expect(m.texto).toContain('paula.gomez@demo.example');
+    // El registro de mails no se borra con la consulta: su asunto no lleva datos de la persona.
+    expect(m.asunto).toBe('Consulta nueva (Instituto o escuela)');
+  });
+
+  it('el aviso lleva en el asunto la institución o el nombre, y se responde a quien escribió', () => {
+    const c = correoConsulta({
+      para: MARCA.emailContacto,
+      tipo: 'Profesional',
+      nombre: 'Paula Gómez',
+      email: 'paula.gomez@demo.example',
+      telefono: null,
+      organizacion: null,
+      ciudad: null,
+      mensaje: null,
+      enlace: 'https://avalya.example/admin/consultas',
+    });
+    expect(c.asunto).toBe('Consulta nueva: Paula Gómez');
+    expect(c.responderA).toBe('paula.gomez@demo.example');
+    expect(c.asuntoRegistro).toBe('Consulta nueva (Profesional)');
+  });
+
+  it('después de 10 avisos en el día, las consultas se guardan sin avisar (no agotan el cupo de mails)', async () => {
+    for (let i = 0; i < 12; i++) expect((await recibirConsulta({ ...base, email: `persona${i}@demo.example` })).ok).toBe(true);
+    expect(await db.select().from(consultas)).toHaveLength(12);
+    expect(await db.select().from(correos)).toHaveLength(10);
   });
 
   it('escapa lo que escribió la persona en el aviso', async () => {
@@ -101,7 +127,7 @@ describe('recibir una consulta', () => {
   it('con demasiadas consultas en la última hora pide que prueben más tarde', async () => {
     const ahora = new Date();
     await db.insert(consultas).values(
-      Array.from({ length: 60 }, (_, i) => ({
+      Array.from({ length: 20 }, (_, i) => ({
         tipo: 'otro' as const,
         nombre: `Persona ${i}`,
         email: `persona${i}@demo.example`,
@@ -134,5 +160,17 @@ describe('recibir una consulta', () => {
     await recibirConsulta(base);
     const lista = await listarConsultas();
     expect(lista.map((c) => c.nombre)).toEqual(['Paula Gómez']);
+  });
+});
+
+describe('tarea diaria', () => {
+  it('sólo la puede llamar quien tiene CRON_SECRET', () => {
+    const pedido = (auth?: string) => new Request('https://avalya.example/tareas/diaria', { headers: auth ? { authorization: auth } : {} });
+    vi.stubEnv('CRON_SECRET', '');
+    expect(esTareaProgramada(pedido('Bearer '))).toBe(false);
+    vi.stubEnv('CRON_SECRET', 'un-secreto-largo-de-prueba-123');
+    expect(esTareaProgramada(pedido())).toBe(false);
+    expect(esTareaProgramada(pedido('Bearer otro-secreto-cualquiera-12'))).toBe(false);
+    expect(esTareaProgramada(pedido('Bearer un-secreto-largo-de-prueba-123'))).toBe(true);
   });
 });

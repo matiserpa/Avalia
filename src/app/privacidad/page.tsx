@@ -140,8 +140,9 @@ export default function Privacidad() {
           Mientras tengas tu cuenta y dure el piloto. <Completar>plazo de conservación al terminar el piloto</Completar>
         </p>
         <p>
-          Las consultas del formulario de contacto, 12 meses desde que llegan: después se borran solas. Si querés que las
-          borremos antes, escribinos.
+          Las consultas del formulario de contacto se guardan en el sitio hasta 12 meses desde que llegan, y después se
+          borran solas. Una copia de cada consulta y los mails que nos crucemos quedan en el correo de {MARCA.responsable}:
+          esos no se borran solos, los borramos si nos lo pedís. Si querés que borremos todo antes, escribinos.
         </p>
       </Seccion>
 

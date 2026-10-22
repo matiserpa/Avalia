@@ -18,6 +18,9 @@ export type Correo = {
   certificadoId?: string;
   // A quién le llega la respuesta si se contesta el mail (las consultas del sitio).
   responderA?: string;
+  // El asunto que queda en el registro, si el del mail lleva datos de una persona (las consultas):
+  // el registro no se borra con la consulta.
+  asuntoRegistro?: string;
 };
 
 export type ResultadoEnvio = { ok: true } | { ok: false; error: string };
@@ -29,7 +32,7 @@ function remitente(): string {
 async function registrar(c: Correo, r: ResultadoEnvio, guardarCuerpo: boolean) {
   await db.insert(correos).values({
     para: c.para,
-    asunto: c.asunto,
+    asunto: c.asuntoRegistro ?? c.asunto,
     plantilla: c.plantilla,
     html: guardarCuerpo ? c.html : null,
     texto: guardarCuerpo ? c.texto : null,

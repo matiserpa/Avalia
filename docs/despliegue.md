@@ -123,6 +123,7 @@ Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 
 | `RESEND_API_KEY` | La clave de Resend | — | |
 | `MAIL_FROM` | `Avalya <hola@mail.<dominio>>` | — | |
 | `DEMO_MODE` | `false` | `true` | **Nunca `true` en el piloto.** |
+| `CRON_SECRET` | 32 caracteres al azar | — | La usa la tarea diaria de `vercel.json` (`/tareas/diaria`), que borra las consultas del sitio de más de 12 meses. Sin ella, la tarea no corre. Se genera con `openssl rand -base64 32`. |
 | `INDEXAR` | `true`, recién con el dominio definitivo | — | Deja indexar en buscadores la portada, `/profesionales`, `/contacto` y `/verificar` y arma `/sitemap.xml`. En la demo no tiene efecto. |
 
 **Ojo con `AUTH_SECRET`:** cambiarlo cierra todas las sesiones y **deja sin efecto los links de activación que ya se mandaron** (se guardan firmados con ese secreto). Si hubiera que rotarlo durante el piloto, después reenviar los mails desde el panel de cada institución a quienes no activaron.
