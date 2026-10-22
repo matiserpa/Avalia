@@ -4,7 +4,16 @@ import { Campo } from '@/components/ui/Campo';
 
 // Formulario para escribir un código a mano. Va por GET a /verificar, que lo revisa y lleva a la
 // verificación: funciona aunque el celular no cargue JavaScript.
-export function FormularioCodigo({ valor = '', error }: { valor?: string; error?: string }) {
+// `variante` secundaria cuando va en una página donde otro botón es el principal (la portada).
+export function FormularioCodigo({
+  valor = '',
+  error,
+  variante = 'primario',
+}: {
+  valor?: string;
+  error?: string;
+  variante?: 'primario' | 'secundario';
+}) {
   return (
     <Form action="/verificar" className="space-y-4" noValidate>
       <Campo
@@ -23,7 +32,7 @@ export function FormularioCodigo({ valor = '', error }: { valor?: string; error?
         autoFocus={Boolean(error)}
         className="[&_input]:font-semibold [&_input]:uppercase [&_input]:tracking-[0.12em] [&_input]:placeholder:normal-case [&_input]:placeholder:tracking-normal"
       />
-      <Boton type="submit" tamano="lg" anchoCompleto icono="lupa">
+      <Boton type="submit" tamano="lg" anchoCompleto icono="lupa" variante={variante}>
         Verificar
       </Boton>
     </Form>

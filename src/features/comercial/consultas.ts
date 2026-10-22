@@ -32,7 +32,7 @@ async function borrarVencidas(): Promise<void> {
 
 export const NOMBRES_TIPO: Record<TipoConsulta, string> = {
   instituto: 'Instituto o escuela',
-  asociacion: 'Asociación o colegio profesional',
+  asociacion: 'Asociación profesional',
   congreso: 'Congreso o jornada',
   profesional: 'Profesional',
   otro: 'Otro',
@@ -84,19 +84,21 @@ export function validarConsulta(d: DatosConsulta): { ok: true; valores: Valores 
   const mensaje = limpiarMensaje(d.mensaje);
 
   if (!(TIPOS_CONSULTA as readonly string[]).includes(tipo)) errores.tipo = 'Elegí una opción.';
-  if (!nombre) errores.nombre = 'Escribí tu nombre.';
+  if (!nombre) errores.nombre = 'Escribí tu nombre y apellido.';
   else if (nombre.length > MAXIMOS.nombre) errores.nombre = `Usá hasta ${MAXIMOS.nombre} caracteres.`;
   if (!email) errores.email = 'Escribí tu mail.';
-  else if (email.length > MAXIMOS.email || !emailValido(email)) errores.email = 'Revisá el mail: tiene que ser del tipo nombre@ejemplo.com.';
+  else if (email.length > MAXIMOS.email || !emailValido(email)) {
+    errores.email = 'Revisá el mail: tiene que tener una @ y terminar en algo como .com o .com.ar.';
+  }
   if (telefono) {
     const digitos = telefono.replace(/\D/g, '');
     if (telefono.length > MAXIMOS.telefono || !/^[\d\s()+-]+$/.test(telefono) || digitos.length < 6 || digitos.length > 15) {
-      errores.telefono = 'Revisá el número: sólo números, con el código de área. Por ejemplo, 299 412 3456.';
+      errores.telefono = 'Revisá el número: escribilo con el código de área, sólo con números.';
     }
   }
   if (organizacion.length > MAXIMOS.organizacion) errores.organizacion = `Usá hasta ${MAXIMOS.organizacion} caracteres.`;
   if (ciudad.length > MAXIMOS.ciudad) errores.ciudad = `Usá hasta ${MAXIMOS.ciudad} caracteres.`;
-  if (mensaje.length > MAXIMOS.mensaje) errores.mensaje = `Usá hasta ${MAXIMOS.mensaje} caracteres. Lo que falte, lo hablamos por mail.`;
+  if (mensaje.length > MAXIMOS.mensaje) errores.mensaje = 'Usá hasta 2.000 caracteres. Lo que falte, lo hablamos por mail.';
   if (!d.acepto) errores.acepto = 'Para responderte necesitamos que aceptes el aviso de privacidad.';
 
   if (Object.keys(errores).length) return { ok: false, errores };

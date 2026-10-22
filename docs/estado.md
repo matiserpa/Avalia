@@ -166,6 +166,29 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 - Primer despliegue real de la demo (proyecto `avalia-demo` en Vercel): sin base conectada mostraba un error genérico en inglés. Ahora, si falta configuración, todas las páginas muestran "Falta terminar de configurar el sitio" con lo que falta (`faltaConfigurar` en `src/lib/config.ts`). Además se corrigieron dos fallas que iban a aparecer al conectar Neon: su cadena trae `channel_binding`, que Postgres rechaza, y dos copias arrancando juntas chocaban al armar la base (ahora hay un candado). Pruebas en `tests/unit/configuracion.test.ts`.
 - Se puede agregar a la pantalla de inicio del celular y se abre como app: ícono propio (`src/components/marca/IconoApp.tsx`), `src/app/manifest.ts` y `src/app/apple-icon.tsx`. Cómo hacerlo, en `docs/despliegue.md`.
 
+## Hecho (sitio comercial y nombre Avalya)
+
+- El nombre pasa a ser **Avalya** (con "y").
+- **Sitio comercial** en `src/app/(comercial)/`: portada para instituciones (`/`), `/profesionales` y `/contacto`, con su encabezado (menú en el celular) y su pie. La estructura y los textos salieron de tres propuestas (conversión, confianza y mirada de redes) y un juez; las reglas, en `docs/producto.md` ("Sitio comercial").
+- **Formulario de contacto** con la tabla `consultas`, aviso por mail a la agencia y `/admin/consultas`. En la demo no guarda nada. La política de privacidad suma los datos del formulario (`VERSION_LEGALES` subió: las profesionales vuelven a aceptar).
+- `/verificar` suma "Cómo leer el resultado" y "Lo que tenés que saber".
+- `INDEXAR`: mientras la dirección sea provisoria no se indexa nada (antes la portada sí).
+- Pruebas: `tests/unit/consultas.test.ts` y `tests/e2e/sitio.spec.ts`.
+
+## Para confirmar con el cliente (sitio comercial)
+
+1. **La dirección provisoria muestra la demo**, donde el formulario no guarda nada. Para recibir consultas reales hace falta el proyecto del piloto (base, Resend, `AUTH_SECRET`, `APP_URL`).
+2. **Datos del responsable** (razón social, CUIT y domicilio de Impulso Creativo) para el aviso del formulario y `/privacidad`, y si la inscripción en la AAIP cubre la base de consultas. Sin esto no conviene publicar el formulario con datos reales.
+3. **El aviso por mail de cada consulta lleva todos los datos**: la copia queda en el correo de la agencia más allá de los 12 meses, y la agencia se compromete a borrarla. La alternativa es que lleve sólo el tipo, la institución y el link a `/admin/consultas`.
+4. **Plan de Resend** antes de emitir para un congreso grande: el gratis manda 100 mails por día.
+5. **El kit para egresadas y la campaña de inscripción**: ¿se ofrecen en el piloto y cómo se presupuestan? El sitio sólo dice que son opcionales.
+6. **"Verificar es gratis siempre"**: ¿lo asume la agencia por escrito, en los términos?
+7. **El pie propuesto para el PDF** (ver "Para confirmar con el cliente (surgió en la revisión final)").
+8. **Datos de la demo con formato real** ("MP 4821", el WhatsApp de Agustina y el ejemplo "299 412 3456" en el perfil): ¿se cambian por datos claramente ficticios? El sitio comercial ya usa "MP 0000".
+9. **La frase para la promoción** («Los certificados de nuestros cursos se pueden verificar») vale sólo para los cursos emitidos con Avalya: dejarlo escrito en el acuerdo con cada institución.
+10. **Capacidad para atender** las consultas, las reuniones y las altas de instituciones nuevas durante el piloto.
+11. **Colegios profesionales**: el formulario dice "asociación profesional" para no mezclar a Avalya con quien otorga la matrícula. ¿Son un público buscado?
+
 ## Falta
 
 - Lo de "Antes del primer despliegue" en `docs/despliegue.md`: dominio, marca en el INPI, inscripción en la AAIP, revisión legal y logo.

@@ -6,14 +6,17 @@ export function LogoInstitucion({
   nombre,
   tamano = 'md',
   className = '',
+  src,
 }: {
   logoId: string | null;
   nombre: string;
   tamano?: 'sm' | 'md' | 'lg';
   className?: string;
+  // Una imagen fija en lugar de la guardada (las muestras del sitio comercial).
+  src?: string;
 }) {
   const t = { sm: 'size-9', md: 'size-12', lg: 'size-16' }[tamano];
-  const url = urlImagen(logoId);
+  const url = src ?? urlImagen(logoId);
   if (url) {
     return (
       // eslint-disable-next-line @next/next/no-img-element

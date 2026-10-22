@@ -42,9 +42,8 @@ test.describe('perfil público', () => {
 });
 
 test.describe('portada y textos legales', () => {
-  test('la portada se indexa y permite verificar', async ({ page }) => {
+  test('la portada permite verificar', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /^index/);
     await page.getByLabel('Código del certificado').fill('VR4K-7M2P');
     await page.getByRole('button', { name: 'Verificar' }).click();
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Certificado válido');

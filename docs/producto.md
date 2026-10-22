@@ -31,11 +31,19 @@ Dura 3 meses, en Patagonia, con dos instituciones y decenas de personas. Queremo
 
 ## Mapa de pantallas
 
+### Sitio comercial (encabezado y pie propios, `src/app/(comercial)/`)
+Le habla primero a las instituciones, que son las que pagan. El objetivo es que una institución pida sumarse al piloto. La especificación completa de estructura y textos salió de tres propuestas y un juez (conversión, confianza y mirada de redes); las reglas están en "Sitio comercial" más abajo.
+
+| Ruta | Pantalla |
+|---|---|
+| `/` | Portada para instituciones: qué gana, acceso rápido para verificar un código, muestras de cómo se ve su logo, cómo funciona, congresos y jornadas, preguntas frecuentes y cierre |
+| `/profesionales` | Qué es el pasaporte, cómo se activa, qué lleva sello y qué no, y un mensaje listo para contarle a su institución (WhatsApp o copiar) |
+| `/contacto` | Formulario de consulta, con aviso de privacidad y consentimiento. En la demo no guarda nada |
+
 ### Público
 | Ruta | Pantalla |
 |---|---|
-| `/` | Portada: qué es, verificar un código, contacto para instituciones |
-| `/verificar` | Escribir un código a mano |
+| `/verificar` | Escribir un código a mano, cómo leer el resultado y lo que hay que saber |
 | `/v/[código]` | Verificación con tres estados: **válido**, **anulado** y **no encontrado** |
 | `/p/[slug]` | Perfil público. Si el perfil es privado o no existe, se muestra el mismo mensaje en los dos casos. |
 | `/terminos`, `/privacidad` | Textos legales. Son un **borrador para revisar con un abogado**. |
@@ -66,6 +74,7 @@ Dura 3 meses, en Patagonia, con dos instituciones y decenas de personas. Queremo
 |---|---|
 | `/admin` | Instituciones: alta con logo e invitación a la persona responsable |
 | `/admin/metricas` | Métricas del piloto, por institución y por semana |
+| `/admin/consultas` | Lo que llega desde `/contacto`: marcar como respondida o borrar |
 
 ### Demo (solo con `DEMO_MODE=true`)
 | Ruta | Pantalla |
@@ -112,7 +121,7 @@ Son las recomendaciones del análisis inicial, aplicadas por defecto.
 7. **Lo verificado y lo declarado se ven distintos.**
    - Verificado: los certificados que emitió una institución. Llevan sello verde.
    - Declarado por la profesional: profesión, ciudad, matrícula y contacto. No llevan sello, y la matrícula se rotula como "declarada".
-8. **En el piloto nada se indexa en buscadores**, salvo la portada. Los perfiles se comparten por link.
+8. **Mientras la dirección sea provisoria, nada se indexa en buscadores.** Con `INDEXAR=true` (sólo con el dominio definitivo, nunca en la demo) se indexan `/`, `/profesionales`, `/contacto` y `/verificar`, y aparecen en `/sitemap.xml`. Perfiles, verificaciones, paneles y legales nunca: se comparten por link.
 9. **Las métricas no guardan IP, navegador ni cookies de seguimiento.**
    - No se cuentan las visitas de la propia profesional a su perfil o a sus certificados.
    - Tampoco se cuentan las de la institución emisora sobre sus certificados ni las del admin.
@@ -123,6 +132,15 @@ Son las recomendaciones del análisis inicial, aplicadas por defecto.
 11. **Un link de activación sirve para entrar sólo hasta que el certificado queda en una cuenta.** Después se entra con el código por mail. Así un link viejo (por ejemplo, uno mandado por WhatsApp) no abre la cuenta de nadie. Al borrar la cuenta, los links sin usar de sus certificados también se anulan.
 12. **Si el nombre de un certificado no coincide con el del perfil, el perfil lo muestra: "A nombre de …".** Cubre un cambio de apellido y el caso de alguien que sumó un certificado ajeno.
 13. **Las métricas no cuentan a los programas que arman vistas previas de links** (WhatsApp, Instagram, buscadores). Se mira el navegador en el momento y no se guarda.
+
+## Sitio comercial
+
+- **Un solo llamado principal:** "Sumar mi institución al piloto", que lleva a `/contacto` (congresos: `/contacto?tipo=congreso`).
+- **No se publica:** precios, cupos, fechas, cifras, testimonios, nombres de las instituciones aliadas, competidores ni promesas de habilitación. Avalya confirma quién emitió un certificado; no "acredita" ni habilita para ejercer.
+- **Muestras:** se arman con los componentes reales y datos fijos inventados (`src/features/comercial/muestras.ts`), así se ven igual en la demo y en el piloto. Ninguna deja ver un mail ni el dominio; la matrícula es "MP 0000". Las dos capturas reales (resumen de un curso y emisión) están recortadas sin mails, en `public/comercial/`.
+- **El verde sigue siendo sólo para lo verificado:** dentro de las muestras y en "Cómo leer el resultado" de `/verificar`. Nunca en botones, beneficios ni en el mensaje de éxito del formulario. Una prueba de punta a punta lo controla.
+- **Formulario de contacto:** 3 campos obligatorios y la casilla de consentimiento, con el aviso de privacidad en el mismo lugar (Ley 25.326, artículo 6, y la leyenda de la Disposición 10/2008). No manda un mail automático a quien escribe; a la agencia le llega un aviso con "responder a". Las consultas se borran solas a los 12 meses.
+- **El encabezado mínimo sigue** en las páginas a las que se llega por un QR o un link (perfil, verificación): nada que distraiga. Su pie suma sólo "Para instituciones".
 
 ## Reglas de privacidad (Ley 25.326)
 

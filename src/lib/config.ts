@@ -32,6 +32,12 @@ export function modoCorreo(): 'bandeja' | 'resend' {
   return 'bandeja';
 }
 
+// Si las páginas del sitio comercial se dejan indexar en buscadores. Sólo con INDEXAR=true y
+// nunca en la demo: mientras la dirección sea provisoria no se define, y no se indexa nada.
+export function indexar(): boolean {
+  return process.env.INDEXAR === 'true' && !modoDemo();
+}
+
 export function adminEmails(): string[] {
   return (process.env.ADMIN_EMAILS || '')
     .split(',')
