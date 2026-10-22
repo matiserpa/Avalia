@@ -4,6 +4,7 @@ import { Boton } from '@/components/ui/Boton';
 import { EstadoVacio } from '@/components/ui/EstadoVacio';
 import { Icono } from '@/components/ui/Icono';
 import { Etiqueta } from '@/components/ui/Sello';
+import { MARCA } from '@/config/marca';
 import { listarConsultas, NOMBRES_TIPO } from '@/features/comercial/consultas';
 import { requerirAdmin } from '@/lib/auth/guardas';
 import { modoDemo } from '@/lib/config';
@@ -35,7 +36,7 @@ export default async function Consultas() {
       )}
       {lista.length === 0 ? (
         <EstadoVacio icono="mail" titulo="Todavía no llegó ninguna consulta" nivel="h2">
-          Cuando alguien escriba desde el sitio, la vas a ver acá y te llega un aviso a tu mail.
+          Cuando alguien escriba desde el sitio, la vas a ver acá. Además le avisamos por mail a {MARCA.emailContacto}.
         </EstadoVacio>
       ) : (
         <ul className="max-w-3xl space-y-4">

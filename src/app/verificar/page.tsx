@@ -15,7 +15,7 @@ export function generateMetadata(): Metadata {
     title: 'Verificar un certificado',
     description: descripcion,
     robots: robotsSitio(),
-    openGraph: { title: 'Verificar un certificado', description: descripcion },
+    openGraph: { title: 'Verificar un certificado', description: descripcion, siteName: MARCA.nombre, locale: 'es_AR', type: 'website' },
   };
 }
 
@@ -26,7 +26,7 @@ const RESULTADOS: { tono: 'verde' | 'error' | 'tierra'; icono: NombreIcono; esta
     icono: 'check',
     estado: 'Certificado válido',
     texto:
-      'La institución lo emitió a nombre de esa persona y no lo anuló. Ves el curso, la fecha y quién lo emitió. Si la profesional publicó su perfil, también ves un link a toda su formación.',
+      'La institución lo emitió a nombre de esa persona y no lo anuló. Ves el curso, la fecha y quién lo emitió. Si la profesional lo muestra en su perfil público, también ves un link a toda su formación.',
   },
   {
     tono: 'error',

@@ -118,7 +118,7 @@ export function MuestraPerfil() {
           <TarjetaCertificado key={c.curso} c={c} />
         ))}
       </div>
-      {otros > 0 && <p className="mt-3 text-[0.875rem] text-tinta-suave">Y {cantidad(otros, 'certificado más', 'certificados más')}, de 2026.</p>}
+      {otros > 0 && <p className="mt-3 text-[0.875rem] text-tinta-suave">Y {cantidad(otros, 'certificado más', 'certificados más')}.</p>}
     </div>
   );
 }

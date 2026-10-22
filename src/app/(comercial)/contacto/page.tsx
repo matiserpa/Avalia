@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { FormularioConsulta } from '@/components/comercial/FormularioConsulta';
-import { Aviso } from '@/components/ui/Aviso';
 import { MARCA } from '@/config/marca';
 import { TIPOS_CONSULTA, type TipoConsulta } from '@/db/schema';
 import { metadatosSitio } from '@/features/comercial/sitio';
@@ -48,12 +47,7 @@ export default async function Contacto({ searchParams }: PageProps<'/contacto'>)
 
       <div className="mt-10 grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-7">
-          {modoDemo() && (
-            <Aviso tono="info" titulo="Estás en la demo" className="mb-6">
-              Lo que escribas acá no se guarda ni nos llega. Para escribirnos de verdad, mandanos un mail a {MARCA.emailContacto}.
-            </Aviso>
-          )}
-          <FormularioConsulta tipoInicial={tipo} />
+          <FormularioConsulta tipoInicial={tipo} demo={modoDemo()} />
         </div>
         <section aria-labelledby="titulo-despues" className="lg:col-span-5">
           <h2 id="titulo-despues" className="text-[1.375rem] font-bold tracking-tight">

@@ -354,7 +354,7 @@ export default async function Portada({ searchParams }: PageProps<'/'>) {
             </h2>
             <p className="mt-3 text-tinta-suave">
               Cargás la lista de asistentes que ya tenés y emitís todos los certificados juntos. A cada asistente le mandamos un
-              mail para que active su pasaporte, con su certificado, su código y su QR. Y si publica su perfil, tu congreso queda
+              mail para que active su pasaporte y descargue su certificado en PDF, con su código y su QR. Y si publica su perfil, tu congreso queda
               ahí, con tu logo, mucho después de que termina.
             </p>
             <ul className="mt-5 space-y-2.5">

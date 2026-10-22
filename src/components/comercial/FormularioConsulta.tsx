@@ -21,7 +21,8 @@ const OPCIONES: { valor: TipoConsulta; texto: string }[] = [
   { valor: 'otro', texto: 'Otro' },
 ];
 
-export function FormularioConsulta({ tipoInicial }: { tipoInicial?: TipoConsulta }) {
+// `demo`: avisa arriba que no se guarda nada (el aviso se va con el formulario al enviarlo).
+export function FormularioConsulta({ tipoInicial, demo = false }: { tipoInicial?: TipoConsulta; demo?: boolean }) {
   const [estado, enviar] = useActionState<EstadoConsulta, FormData>(enviarConsulta, { intento: 0 });
   const titulo = useRef<HTMLParagraphElement>(null);
 
@@ -36,6 +37,11 @@ export function FormularioConsulta({ tipoInicial }: { tipoInicial?: TipoConsulta
   const tipoElegido = v?.tipo ?? tipoInicial;
   return (
     <form key={estado.intento} action={enviar} className="space-y-6" noValidate>
+      {demo && (
+        <Aviso tono="info" titulo="Estás en la demo">
+          Lo que escribas acá no se guarda ni nos llega. Para escribirnos de verdad, mandanos un mail a {MARCA.emailContacto}.
+        </Aviso>
+      )}
       {Object.keys(e).length > 0 && <Aviso tono="error" titulo="Revisá los datos marcados." />}
       {estado.error && <Aviso tono="error">{estado.error}</Aviso>}
 
