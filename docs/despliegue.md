@@ -18,6 +18,23 @@ Costo mensual aproximado del piloto: **US$ 45 a 65** (Vercel US$ 20 + Supabase U
 
 **Regla de oro:** la demo y el piloto nunca comparten base de datos, `AUTH_SECRET` ni dominio. En la demo cualquiera puede entrar como cualquiera (`/demo/entrar`) y el botón "Reiniciar los datos" **borra todo**.
 
+## La demo en la web, en 10 minutos
+
+Para verla desde cualquier navegador o celular, sin instalar nada. Con `DEMO_MODE=true` la demo se arma sola al arrancar: crea las tablas y carga los datos de prueba. Si falta `APP_URL`, toma la dirección que Vercel le da al proyecto.
+
+1. En [vercel.com/new](https://vercel.com/new), entrar con la cuenta de GitHub e importar el repositorio `matiserpa/Avalia`.
+2. Antes de tocar **Deploy**, en **Environment Variables**, agregar `DEMO_MODE` = `true`.
+3. Tocar **Deploy**. La compilación termina bien, pero el sitio todavía no anda: falta la base de datos.
+4. En el proyecto, ir a **Storage**, crear una base **Neon** (Postgres) y conectarla al proyecto. Elegir la región São Paulo si aparece. Vercel carga sola la variable `DATABASE_URL`. Una base de Supabase conectada desde el mismo menú también sirve: carga `POSTGRES_URL`, que el código también lee.
+5. En **Deployments**, volver a desplegar el último (**Redeploy**).
+6. Abrir `https://<el-proyecto>.vercel.app/demo`. La primera carga tarda unos segundos más, mientras arma la base.
+
+Si la primera carga da error, se recarga la página. Si los datos quedan raros, se usa el botón **Reiniciar los datos de la demo** de `/demo`.
+
+Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
+
+Probado el 22/10/2026 con la compilación de producción, contra un Postgres 16 y sin `APP_URL`: la demo se armó sola y pasaron las 47 pruebas de punta a punta.
+
 ## Antes del primer despliegue (una sola vez)
 
 1. **Dominio.** Es el que va impreso en los QR para siempre: después no se cambia.

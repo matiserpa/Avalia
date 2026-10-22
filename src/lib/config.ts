@@ -4,7 +4,10 @@
 // apuntaría a localhost y los mails que salgan no se pueden corregir). Durante la compilación no se
 // exige: ahí no se arma ningún link.
 export function urlBase(): string {
-  const url = process.env.APP_URL;
+  // En la demo publicada en Vercel, si falta APP_URL sirve la dirección del proyecto. En el piloto
+  // no: la dirección va impresa en los QR y tiene que ser la definitiva, puesta a mano.
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const url = process.env.APP_URL || (modoDemo() && vercel ? `https://${vercel}` : '');
   if (!url && process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
     throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://sella.com.ar');
   }

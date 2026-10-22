@@ -2,7 +2,8 @@
 //
 // - Sin DATABASE_URL: PGlite, un Postgres completo que corre dentro de Node y guarda los datos
 //   en .data/pglite. Es lo que permite correr todo local con `npm run dev`, sin instalar nada.
-// - Con DATABASE_URL: Postgres de verdad (Supabase, Neon o el que sea) vía postgres-js.
+// - Con DATABASE_URL: Postgres de verdad (Supabase, Neon o el que sea) vía postgres-js. Si no
+//   está, se toma POSTGRES_URL, que es la que crea Vercel al conectar una base desde su panel.
 //
 // Las dos variantes exponen la misma API de Drizzle, así que el resto del código no se entera.
 
@@ -17,12 +18,23 @@ export type Db = ReturnType<typeof drizzlePostgres<typeof schema>>;
 type Global = typeof globalThis & { __sellaDb?: Db; __sellaPglite?: PGlite };
 const g = globalThis as Global;
 
+// La cadena de conexión, o '' si no hay (PGlite).
+export function urlDeLaBase(): string {
+  const cruda = process.env.DATABASE_URL || process.env.POSTGRES_URL || '';
+  if (!cruda) return '';
+  // La integración de Supabase en Vercel agrega parámetros propios que Postgres no entiende.
+  const url = new URL(cruda);
+  url.searchParams.delete('supa');
+  url.searchParams.delete('pgbouncer');
+  return url.toString();
+}
+
 export function directorioPglite() {
   return process.env.PGLITE_DIR || '.data/pglite';
 }
 
 function crearDb(): Db {
-  const url = process.env.DATABASE_URL;
+  const url = urlDeLaBase();
   if (url) {
     // prepare: false porque el pooler de Supabase en modo transacción no admite sentencias preparadas.
     const cliente = postgres(url, { prepare: false, max: Number(process.env.DATABASE_POOL_MAX || 5) });
@@ -49,7 +61,7 @@ export const db: Db = new Proxy({} as Db, {
 });
 
 export function usaPglite() {
-  return !process.env.DATABASE_URL;
+  return !urlDeLaBase();
 }
 
 export function clientePglite(): PGlite | undefined {
