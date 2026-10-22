@@ -16,10 +16,16 @@ export function urlBase(): string {
 
 // Modo demo: bandeja de mails en pantalla, accesos rápidos y botón para reiniciar los datos.
 // NUNCA en el ambiente del piloto: cualquiera podría entrar como cualquiera.
-// Se acepta "true" escrito de cualquier forma razonable ("True", " true", con comillas) o "1":
-// en el panel de Vercel es fácil cargarlo así y que la demo no arranque sin que se note por qué.
+// - DEMO_MODE la prende con "true" escrito de cualquier forma razonable ("True", " true", con
+//   comillas) o "1", y la apaga con "false", "0" o "no".
+// - Si no dice ni una cosa ni la otra, el sitio publicado en Vercel sin base de datos arranca como
+//   demo: sin base no hay datos reales que cuidar (usa una base en memoria con datos inventados) y
+//   alcanza con publicarlo para mostrarlo, sin cargar variables. Con una base conectada, no.
 export function modoDemo(): boolean {
-  return valorDemo() === 'true' || valorDemo() === '1';
+  const v = valorDemo();
+  if (v === 'true' || v === '1') return true;
+  if (v === 'false' || v === '0' || v === 'no') return false;
+  return Boolean(process.env.VERCEL) && !hayBase();
 }
 
 // Lo que llega en DEMO_MODE, limpio (sin espacios ni comillas, en minúsculas). null si no está.
@@ -28,6 +34,11 @@ export function valorDemo(): string | null {
   const v = process.env.DEMO_MODE;
   if (v === undefined) return null;
   return v.trim().replace(/^["']+|["']+$/g, '').trim().toLowerCase();
+}
+
+// Si hay una base de datos conectada (la misma cadena que lee urlDeLaBase en src/db/index.ts).
+export function hayBase(): boolean {
+  return Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
 }
 
 // 'bandeja': los mails no salen, quedan en la base y se ven en /demo/bandeja (demo y desarrollo).
@@ -83,8 +94,9 @@ export function faltaConfigurar(): Faltante[] {
   if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PHASE === 'phase-production-build') return [];
   const falta: Faltante[] = [];
   // En Vercel el disco es de sólo lectura: el piloto sin una base conectada no puede andar. La
-  // demo sí (usa una base en memoria; ver directorioPglite en src/db/index.ts).
-  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.POSTGRES_URL && !modoDemo()) falta.push('base');
+  // demo sí (usa una base en memoria; ver directorioPglite en src/db/index.ts). Sin base, sólo se
+  // llega acá si DEMO_MODE apaga la demo a propósito.
+  if (process.env.VERCEL && !hayBase() && !modoDemo()) falta.push('base');
   if (!modoDemo()) {
     if (!process.env.APP_URL) falta.push('APP_URL');
     if ((process.env.AUTH_SECRET ?? '').length < 32) falta.push('AUTH_SECRET');

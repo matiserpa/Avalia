@@ -45,13 +45,48 @@ describe('lo que falta configurar', () => {
     expect(directorioPglite()).toBe('memory://');
   });
 
-  it('el piloto en Vercel sin base avisa que falta', () => {
+  it('publicado en Vercel sin base es demo aunque no se cargue DEMO_MODE', () => {
     vi.stubEnv('NODE_ENV', 'production');
     vi.stubEnv('VERCEL', '1');
-    vi.stubEnv('DEMO_MODE', '');
     vi.stubEnv('DATABASE_URL', '');
     vi.stubEnv('POSTGRES_URL', '');
-    expect(faltaConfigurar()).toContain('base');
+    vi.stubEnv('APP_URL', '');
+    for (const v of [undefined, '', 'si']) {
+      vi.stubEnv('DEMO_MODE', v);
+      expect(modoDemo(), String(v)).toBe(true);
+      expect(faltaConfigurar(), String(v)).toEqual([]);
+    }
+  });
+
+  it('con una base conectada no es demo salvo que DEMO_MODE lo pida', () => {
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('DATABASE_URL', 'postgres://u:p@base.example/db');
+    vi.stubEnv('DEMO_MODE', undefined);
+    expect(modoDemo()).toBe(false);
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('POSTGRES_URL', 'postgres://u:p@base.example/db');
+    expect(modoDemo()).toBe(false);
+    vi.stubEnv('DEMO_MODE', 'true');
+    expect(modoDemo()).toBe(true);
+  });
+
+  it('fuera de Vercel, sin DEMO_MODE no es demo', () => {
+    vi.stubEnv('VERCEL', undefined);
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('POSTGRES_URL', '');
+    vi.stubEnv('DEMO_MODE', undefined);
+    expect(modoDemo()).toBe(false);
+  });
+
+  it('en Vercel sin base, con DEMO_MODE=false avisa que falta la base', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    vi.stubEnv('VERCEL', '1');
+    vi.stubEnv('DATABASE_URL', '');
+    vi.stubEnv('POSTGRES_URL', '');
+    for (const v of ['false', ' False ', '0', 'no']) {
+      vi.stubEnv('DEMO_MODE', v);
+      expect(faltaConfigurar(), v).toContain('base');
+    }
   });
 
   it('el piloto necesita la dirección, la clave y los mails por Resend', () => {
@@ -74,6 +109,7 @@ describe('lo que falta configurar', () => {
 
 describe('modo demo', () => {
   it('acepta true escrito de varias formas, y nada más', () => {
+    vi.stubEnv('VERCEL', undefined);
     for (const v of ['true', 'True', ' TRUE ', '"true"', "'true'", '1']) {
       vi.stubEnv('DEMO_MODE', v);
       expect(modoDemo(), v).toBe(true);

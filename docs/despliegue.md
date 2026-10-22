@@ -11,7 +11,7 @@ Cómo publicar la **demo** (para reuniones) y el **piloto** (con personas reales
 | Hosting | **Vercel Pro**, funciones en São Paulo (`gru1`) | Vercel, otro proyecto del mismo equipo |
 | Base de datos | **Supabase Pro** en São Paulo (`sa-east-1`) | Otro proyecto de Supabase, aparte |
 | Mails | **Resend** con dominio propio (`MAIL_MODE=resend`) | Bandeja en pantalla (`MAIL_MODE=bandeja`) |
-| `DEMO_MODE` | `false` | `true` |
+| `DEMO_MODE` | `false` | `true` (sin base, en Vercel, no hace falta) |
 | Dominio | El definitivo (va en los QR) | Un subdominio, por ejemplo `demo.<dominio>` |
 
 Costo mensual aproximado del piloto: **US$ 45 a 65** (Vercel US$ 20 + Supabase US$ 25 + Resend gratis o US$ 20). Más el dominio y la marca, que se pagan una vez (ver abajo).
@@ -20,19 +20,19 @@ Costo mensual aproximado del piloto: **US$ 45 a 65** (Vercel US$ 20 + Supabase U
 
 ## La demo en la web, en 5 minutos
 
-Para verla desde cualquier navegador o celular, sin instalar nada. Con `DEMO_MODE=true` la demo se arma sola al arrancar: crea las tablas y carga los datos de prueba (todos inventados). Si falta `APP_URL`, toma la dirección que Vercel le da al proyecto.
+Para verla desde cualquier navegador o celular, sin instalar nada. **Publicado en Vercel sin base de datos, el sitio es la demo sin cargar ninguna variable:** sin base no hay datos reales que cuidar. Se arma sola al arrancar: crea las tablas y carga los datos de prueba (todos inventados). Si falta `APP_URL`, toma la dirección que Vercel le da al proyecto. `DEMO_MODE=true` sigue sirviendo para la demo con base (abajo); `DEMO_MODE=false` la apaga.
 
 1. En [vercel.com/new](https://vercel.com/new), entrar con la cuenta de GitHub e importar el repositorio `matiserpa/Avalia`.
-2. En **Environment Variables**, agregar `DEMO_MODE` = `true`. Si el proyecto ya existe: **Settings → Environment Variables**.
-3. Tocar **Deploy** (o **Deployments → Redeploy** si ya existía).
-4. Abrir `https://<el-proyecto>.vercel.app/demo`. La primera carga tarda unos segundos más, mientras arma la base.
+2. Tocar **Deploy** (o **Deployments → Redeploy** si ya existía). No hace falta cargar variables.
+3. Abrir `https://<el-proyecto>.vercel.app/demo`. La primera carga tarda unos segundos más, mientras arma la base.
 
 **Sin base conectada, los datos viven en la memoria del servidor.** Alcanza para mostrar la demo, pero vuelven al estado inicial cada vez que Vercel arranca un servidor nuevo: después de un rato sin visitas, con cada despliegue y, a veces, con mucho tráfico (cada servidor tiene su copia). Para una demo con datos que no se reinicien:
 
-5. En el proyecto, ir a **Storage**, crear una base **Neon** (Postgres) y conectarla al proyecto. Elegir la región São Paulo si aparece. Vercel carga sola la variable `DATABASE_URL`. Una base de Supabase conectada desde el mismo menú también sirve: carga `POSTGRES_URL`, que el código también lee.
+4. En el proyecto, ir a **Storage**, crear una base **Neon** (Postgres) y conectarla al proyecto. Elegir la región São Paulo si aparece. Vercel carga sola la variable `DATABASE_URL`. Una base de Supabase conectada desde el mismo menú también sirve: carga `POSTGRES_URL`, que el código también lee.
+5. En **Settings → Environment Variables**, agregar `DEMO_MODE` = `true`, marcando Production: con una base conectada, el sitio no es demo si no se pide (podría ser la base del piloto).
 6. En **Deployments**, volver a desplegar el último (**Redeploy**).
 
-Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice qué falta (sin mostrar ningún valor). En la demo, la causa habitual es que falte `DEMO_MODE`; después de corregirlo hay que volver a desplegar. Si la primera carga da error, se recarga la página. Si los datos quedan raros, se usa el botón **Reiniciar los datos de la demo** de `/demo`.
+Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice qué falta (sin mostrar ningún valor secreto). En la demo sin base, la única causa es que `DEMO_MODE` diga `false`; con base, que falte `DEMO_MODE=true`. Después de corregirlo hay que volver a desplegar. Si la primera carga da error, se recarga la página. Si los datos quedan raros, se usa el botón **Reiniciar los datos de la demo** de `/demo`.
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
@@ -51,7 +51,7 @@ La dirección anterior sigue andando. Cuando llegue el dominio propio, se cambia
 
 Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
 
-Probado el 22/10/2026 con la compilación de producción: como en Vercel sin base (en memoria) pasaron las 71 pruebas de punta a punta; contra un Postgres 16 y sin `APP_URL`, la demo se armó sola. También con una cadena como la de Neon (con `channel_binding`) y con tres copias del servidor arrancando a la vez sobre la base vacía: las tres respondieron y los datos se cargaron una sola vez.
+Probado el 22/10/2026 con la compilación de producción: como en Vercel sin base y sin ninguna variable (en memoria) pasaron las 71 pruebas de punta a punta; contra un Postgres 16 y sin `APP_URL`, la demo se armó sola. También con una cadena como la de Neon (con `channel_binding`) y con tres copias del servidor arrancando a la vez sobre la base vacía: las tres respondieron y los datos se cargaron una sola vez.
 
 ## Antes del primer despliegue (una sola vez)
 
@@ -129,7 +129,7 @@ Probado el 22/10/2026 con la compilación de producción: como en Vercel sin bas
 | `MAIL_MODE` | `resend` | `bandeja` | En el piloto es obligatorio `resend`: si falta o dice otra cosa, el sitio no manda mails y muestra un error (así nunca guarda en la base mails con códigos o links). |
 | `RESEND_API_KEY` | La clave de Resend | — | |
 | `MAIL_FROM` | `Avalya <hola@mail.<dominio>>` | — | |
-| `DEMO_MODE` | `false` | `true` | **Nunca `true` en el piloto.** |
+| `DEMO_MODE` | `false` | `true` | **Nunca `true` en el piloto.** Si no se define, el sitio es demo sólo si está en Vercel sin base. |
 | `CRON_SECRET` | 32 caracteres al azar | — | La usa la tarea diaria de `vercel.json` (`/tareas/diaria`), que borra las consultas del sitio de más de 12 meses. Sin ella, la tarea no corre. Se genera con `openssl rand -base64 32`. |
 | `INDEXAR` | `true`, recién con el dominio definitivo | — | Deja indexar en buscadores la portada, `/profesionales`, `/contacto` y `/verificar` y arma `/sitemap.xml`. En la demo no tiene efecto. |
 

@@ -174,7 +174,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 - `/verificar` suma "Cómo leer el resultado" y "Lo que tenés que saber".
 - `INDEXAR`: mientras la dirección sea provisoria no se indexa nada (antes la portada sí).
 - Pruebas: `tests/unit/consultas.test.ts` y `tests/e2e/sitio.spec.ts`.
-- **La demo publicada ya no necesita base:** sin `DATABASE_URL`, con `DEMO_MODE=true`, usa una base en memoria que se arma sola (vuelve al estado inicial cuando Vercel arranca un servidor nuevo). Con Neon conectado, los datos quedan fijos.
+- **La demo publicada ya no necesita base ni variables:** en Vercel sin `DATABASE_URL`, el sitio es la demo aunque no se cargue `DEMO_MODE` y usa una base en memoria que se arma sola (vuelve al estado inicial cuando Vercel arranca un servidor nuevo). `DEMO_MODE=false` la apaga. Con Neon conectado y `DEMO_MODE=true`, los datos quedan fijos; con base y sin `DEMO_MODE=true`, nunca es demo.
 
 ## Para confirmar con el cliente (sitio comercial)
 

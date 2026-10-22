@@ -76,7 +76,7 @@ Le habla primero a las instituciones, que son las que pagan. El objetivo es que 
 | `/admin/metricas` | Métricas del piloto, por institución y por semana |
 | `/admin/consultas` | Lo que llega desde `/contacto`: marcar como respondida o borrar |
 
-### Demo (solo con `DEMO_MODE=true`)
+### Demo (con `DEMO_MODE=true`, o publicada en Vercel sin base)
 | Ruta | Pantalla |
 |---|---|
 | `/demo` | Guía del recorrido para la reunión, con accesos rápidos y botón para reiniciar los datos |
