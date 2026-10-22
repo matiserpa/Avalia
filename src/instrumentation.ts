@@ -11,14 +11,19 @@ export async function register() {
   const hayBase = Boolean(process.env.DATABASE_URL || process.env.POSTGRES_URL);
   if (hayBase && !demo) return;
   // En Vercel el disco es de sólo lectura y cada instancia tendría su propia base: sin
-  // DATABASE_URL no puede andar. Mejor un error claro que uno de PGlite.
-  if (!hayBase && process.env.VERCEL) throw new Error('Falta DATABASE_URL: la cadena de la base de datos (ver docs/despliegue.md).');
-
-  const { migrar } = await import('./db/migrar');
-  await migrar();
-
-  if (demo) {
-    const { cargarDemoSiHaceFalta } = await import('./lib/demo/semilla');
-    await cargarDemoSiHaceFalta();
+  // DATABASE_URL no puede andar. No se corta acá: las páginas muestran qué falta (ver
+  // faltaConfigurar en src/lib/config.ts).
+  if (!hayBase && process.env.VERCEL) {
+    console.error('Falta DATABASE_URL: la cadena de la base de datos (ver docs/despliegue.md).');
+    return;
   }
+
+  const { conCandado, migrar } = await import('./db/migrar');
+  await conCandado(async () => {
+    await migrar();
+    if (demo) {
+      const { cargarDemoSiHaceFalta } = await import('./lib/demo/semilla');
+      await cargarDemoSiHaceFalta();
+    }
+  });
 }

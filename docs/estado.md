@@ -4,7 +4,7 @@
 
 ## Contexto
 
-**Etapa actual: exploración de la idea.** El nombre es **Sella** (de "sello": lo verificado lleva sello). Antes fue "Pasaporte Profesional", "Avalia" y "AvalYa". Todavía no hay logo ni dominio: los dominios que se miraron están registrados por terceros y se está evaluando comprar uno. No se imprime nada todavía. Prioridad: un prototipo que se entienda en una reunión.
+**Etapa actual: exploración de la idea.** El nombre es **Avalia**, provisorio: la marca (nombre, logo y estilo) se define más adelante. Antes se probaron "Pasaporte Profesional", "AvalYa" y "Avalia". Todavía no hay logo ni dominio: los dominios que se miraron están registrados por terceros y se está evaluando comprar uno. No se imprime nada todavía. Prioridad: un prototipo que se entienda en una reunión.
 
 Lo arma Impulso Creativo, una agencia de Buenos Aires especializada en salud, estética y bienestar.
 
@@ -163,6 +163,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 
 - `docs/despliegue.md`: Supabase (pooler en modo transacción, puerto 6543; migraciones por el puerto 5432), Resend con dominio propio (SPF, DKIM y DMARC; tope de 100 mails por día en el plan gratis), Vercel Pro en São Paulo, variables de entorno, ambientes separados de demo y piloto, primer despliegue paso a paso, costos y mantenimiento.
 - `vercel.json` con la región `gru1`, `engines` en `package.json` y límite de 4 MB por imagen en el servidor. Los SVG se aceptan sólo para logos y siempre se convierten a WebP.
+- Primer despliegue real de la demo (proyecto `avalia-demo` en Vercel): sin base conectada mostraba un error genérico en inglés. Ahora, si falta configuración, todas las páginas muestran "Falta terminar de configurar el sitio" con lo que falta (`faltaConfigurar` en `src/lib/config.ts`). Además se corrigieron dos fallas que iban a aparecer al conectar Neon: su cadena trae `channel_binding`, que Postgres rechaza, y dos copias arrancando juntas chocaban al armar la base (ahora hay un candado). Pruebas en `tests/unit/configuracion.test.ts`.
 
 ## Falta
 
@@ -176,7 +177,7 @@ Seis frentes revisados en paralelo (privacidad, permisos, accesibilidad, textos,
 ## Para confirmar con el cliente (surgió en la revisión final)
 
 - **Quien abre el link para WhatsApp acepta los términos en nombre de la profesional.** La institución ve ese link: alguien de la institución podría activar el pasaporte de una egresada, y de paso ver los certificados que otras instituciones le emitieron a ese mismo mail. Para el piloto, con dos instituciones aliadas, propongo dejarlo como está y sumar al acuerdo con cada institución que ese link es sólo para la egresada. Para después del piloto, la alternativa es que activar con un link compartido pida además un código por mail (con el costo de que no sirve si el mail estaba mal escrito, que es justo cuando se usa WhatsApp).
-- **El PDF dice "CERTIFICADO" y "Se certifica que…"** y no aclara que acompaña al certificado de la institución ni que no reemplaza la matrícula (la verificación sí lo aclara). Propuesta para validar con el abogado: sumar al pie "Copia digital emitida por {institución} con Sella. Acompaña al certificado de la institución y no reemplaza la matrícula profesional."
+- **El PDF dice "CERTIFICADO" y "Se certifica que…"** y no aclara que acompaña al certificado de la institución ni que no reemplaza la matrícula (la verificación sí lo aclara). Propuesta para validar con el abogado: sumar al pie "Copia digital emitida por {institución} con Avalia. Acompaña al certificado de la institución y no reemplaza la matrícula profesional."
 - **Las sesiones duran 30 días** desde que se ingresa; después se pide un código nuevo. No se renuevan solas.
 - **Tipos de curso:** se agregó "Jornada" y "Workshop" se muestra como "Taller". Confirmar que así lo llaman las instituciones.
 
@@ -189,7 +190,7 @@ Están en `docs/producto.md`, sección "Decisiones tomadas". Resumen:
 3. Borrar la cuenta deja los certificados desvinculados (a validar con el abogado).
 4. La verificación aclara su alcance ("No reemplaza la matrícula profesional").
 5. El PDF acompaña al de la institución, no lo reemplaza. No lleva DNI y el DNI no se guarda.
-6. El dominio de los QR sale de `APP_URL`. Por ahora es una idea en exploración: **no hay dominio ni logo definidos** (el nombre ya es Sella) y no se va a imprimir nada todavía. No hace falta preguntarlo de nuevo: se define recién antes de emitir certificados reales en el piloto.
+6. El dominio de los QR sale de `APP_URL`. Por ahora es una idea en exploración: **no hay dominio ni logo definidos** (el nombre ya es Avalia) y no se va a imprimir nada todavía. No hace falta preguntarlo de nuevo: se define recién antes de emitir certificados reales en el piloto.
 
 ## Cambio de stack respecto de la propuesta inicial
 

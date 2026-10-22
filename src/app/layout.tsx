@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from 'next';
 import { connection } from 'next/server';
+import { FaltaConfigurar } from '@/components/layout/FaltaConfigurar';
 import { MARCA } from '@/config/marca';
-import { urlBase } from '@/lib/config';
+import { faltaConfigurar, urlBase } from '@/lib/config';
 import { urbanist } from './fuentes';
 import './globals.css';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    metadataBase: new URL(urlBase()),
+    // Sin configurar, urlBase() puede no tener de dónde sacar la dirección.
+    metadataBase: faltaConfigurar().length ? undefined : new URL(urlBase()),
     title: { default: MARCA.nombre, template: `%s · ${MARCA.nombre}` },
     description: MARCA.descripcion,
     applicationName: MARCA.nombre,
@@ -27,6 +29,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: LayoutProps<'/'>) {
   // Todas las páginas se arman en cada pedido: nada se prerenderiza con datos viejos.
   await connection();
+  const falta = faltaConfigurar();
   return (
     <html lang="es-AR" className={`${urbanist.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
@@ -36,7 +39,7 @@ export default async function RootLayout({ children }: LayoutProps<'/'>) {
         >
           Saltar al contenido
         </a>
-        {children}
+        {falta.length ? <FaltaConfigurar falta={falta} /> : children}
       </body>
     </html>
   );

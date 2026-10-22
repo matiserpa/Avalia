@@ -1,4 +1,4 @@
-// Logo provisorio de Sella (el nombre ya está; el diseño del logo todavía no). Se reemplaza este archivo
+// Logo provisorio de Avalia (el nombre y el diseño del logo todavía se pueden cambiar). Se reemplaza este archivo
 // (y el nombre en src/config/marca.ts) y cambia en todo el sitio.
 
 import { MARCA } from '@/config/marca';

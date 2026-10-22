@@ -1,6 +1,6 @@
-# Sella: producto
+# Avalia: producto
 
-> **Nombre: Sella** (antes "Pasaporte Profesional", "Avalia" y "AvalYa"). Viene de "sello": el sello verde es lo que distingue lo verificado de lo declarado, y se presta a "Verificado con Sella". Se pronuncia como "sello", así que conviene mostrarlo siempre escrito. El "pasaporte" sigue siendo el nombre de lo que tiene cada profesional: "Activar mi pasaporte". Todavía no hay logo ni dominio: los que se miraron (octubre de 2026) están registrados por terceros y se evalúa comprar uno. El nombre se cambia en `src/config/marca.ts` y el logo en `src/components/marca/Logo.tsx`.
+> **Nombre: Avalia** (antes "Pasaporte Profesional", "Avalia" y "AvalYa"). Viene de "sello": el sello verde es lo que distingue lo verificado de lo declarado, y se presta a "Verificado con Avalia". Se pronuncia como "sello", así que conviene mostrarlo siempre escrito. El "pasaporte" sigue siendo el nombre de lo que tiene cada profesional: "Activar mi pasaporte". Todavía no hay logo ni dominio: los que se miraron (octubre de 2026) están registrados por terceros y se evalúa comprar uno. El nombre se cambia en `src/config/marca.ts` y el logo en `src/components/marca/Logo.tsx`.
 
 ## Para qué sirve
 

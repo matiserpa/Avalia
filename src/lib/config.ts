@@ -9,7 +9,7 @@ export function urlBase(): string {
   const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   const url = process.env.APP_URL || (modoDemo() && vercel ? `https://${vercel}` : '');
   if (!url && process.env.NODE_ENV === 'production' && process.env.NEXT_PHASE !== 'phase-production-build') {
-    throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://sella.com.ar');
+    throw new Error('Falta APP_URL: la dirección pública del sitio, por ejemplo https://avalia.com.ar');
   }
   return (url || 'http://localhost:3000').replace(/\/+$/, '');
 }
@@ -56,6 +56,25 @@ export function secreto(): string {
     throw new Error('Falta AUTH_SECRET (32 caracteres o más). Generalo con: openssl rand -base64 48');
   }
   return 'secreto-de-desarrollo-no-usar-en-produccion-0000';
+}
+
+// Lo que falta configurar para que el sitio publicado funcione. Si algo falta, el sitio muestra
+// una pantalla que lo explica (src/components/layout/FaltaConfigurar.tsx) en vez de un error
+// genérico: quien lo publica no siempre tiene a mano el registro del servidor.
+export type Faltante = 'base' | 'APP_URL' | 'AUTH_SECRET' | 'MAIL_MODE' | 'RESEND_API_KEY';
+
+export function faltaConfigurar(): Faltante[] {
+  if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PHASE === 'phase-production-build') return [];
+  const falta: Faltante[] = [];
+  // En Vercel el disco es de sólo lectura: sin una base conectada no puede andar.
+  if (process.env.VERCEL && !process.env.DATABASE_URL && !process.env.POSTGRES_URL) falta.push('base');
+  if (!modoDemo()) {
+    if (!process.env.APP_URL) falta.push('APP_URL');
+    if ((process.env.AUTH_SECRET ?? '').length < 32) falta.push('AUTH_SECRET');
+    if (process.env.MAIL_MODE !== 'resend') falta.push('MAIL_MODE');
+    else if (!process.env.RESEND_API_KEY) falta.push('RESEND_API_KEY');
+  }
+  return falta;
 }
 
 export function cookieSegura(): boolean {

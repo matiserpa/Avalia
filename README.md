@@ -1,4 +1,4 @@
-# Sella
+# Avalia
 
 Certificados verificables y perfil profesional para la estética. Las instituciones emiten
 certificados con código y QR; cada profesional reúne su formación en un perfil para compartir;
