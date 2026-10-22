@@ -15,6 +15,7 @@ import { sql } from 'drizzle-orm';
 import { db } from '@/db';
 import {
   certificados,
+  consultas,
   cursos,
   egresadas,
   eventos,
@@ -32,6 +33,7 @@ import { VERSION_LEGALES } from '@/lib/legales';
 export { DEMO };
 
 const TABLAS = [
+  'consultas',
   'eventos',
   'correos',
   'sesiones',
@@ -347,4 +349,31 @@ export async function cargarDemo(): Promise<void> {
   }
   ev.push({ tipo: 'verificacion_fallida', canal: 'codigo', creadoEn: haceDias(12) });
   await db.insert(eventos).values(ev);
+
+  // ---------- consultas del sitio (para ver cómo llegan al panel de administración) ----------
+  await db.insert(consultas).values([
+    {
+      tipo: 'congreso',
+      nombre: 'Lorena Paz',
+      email: 'lorena.paz@demo.example',
+      organizacion: 'Jornadas Demo de Estética',
+      ciudad: 'General Roca',
+      mensaje: 'Organizamos unas jornadas en marzo con unas 200 personas. ¿Podemos emitir los certificados de asistencia con ustedes?',
+      aceptoPrivacidadEn: haceDias(1, 10),
+      versionLegales: VERSION_LEGALES,
+      creadaEn: haceDias(1, 10),
+    },
+    {
+      tipo: 'instituto',
+      nombre: 'Mariana Ortiz',
+      email: 'mariana.ortiz@demo.example',
+      organizacion: 'Escuela Demo de Estética',
+      ciudad: 'Neuquén',
+      mensaje: 'Tenemos unas 60 egresadas por año. Queremos saber cómo sumarnos al piloto.',
+      aceptoPrivacidadEn: haceDias(6, 16),
+      versionLegales: VERSION_LEGALES,
+      respondidaEn: haceDias(5, 11),
+      creadaEn: haceDias(6, 16),
+    },
+  ]);
 }

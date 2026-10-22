@@ -302,6 +302,31 @@ export const correos = pgTable(
   (t) => [index('correos_para').on(t.para)],
 );
 
+// ---------- consultas (formulario de contacto del sitio comercial) ----------
+// Quien escribe desde /contacto: casi siempre una institución que quiere sumarse al piloto. Se
+// guarda sólo lo que hace falta para responder, con el momento en que aceptó el aviso de
+// privacidad. Se pueden borrar desde el panel de administración.
+export const TIPOS_CONSULTA = ['instituto', 'asociacion', 'congreso', 'profesional', 'otro'] as const;
+
+export const consultas = pgTable(
+  'consultas',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    tipo: text({ enum: TIPOS_CONSULTA }).notNull(),
+    nombre: text().notNull(),
+    email: text().notNull(),
+    telefono: text(),
+    organizacion: text(),
+    ciudad: text(),
+    mensaje: text(),
+    aceptoPrivacidadEn: timestamp({ withTimezone: true }).notNull(),
+    versionLegales: text().notNull(),
+    respondidaEn: momento(),
+    creadaEn: ahora(),
+  },
+  (t) => [index('consultas_fecha').on(t.creadaEn), index('consultas_email_fecha').on(t.email, t.creadaEn)],
+);
+
 export type Institucion = typeof instituciones.$inferSelect;
 export type Usuario = typeof usuarios.$inferSelect;
 export type Perfil = typeof perfiles.$inferSelect;
@@ -311,3 +336,5 @@ export type Egresada = typeof egresadas.$inferSelect;
 export type Certificado = typeof certificados.$inferSelect;
 export type TipoEvento = (typeof TIPOS_EVENTO)[number];
 export type Canal = (typeof CANALES)[number];
+export type Consulta = typeof consultas.$inferSelect;
+export type TipoConsulta = (typeof TIPOS_CONSULTA)[number];

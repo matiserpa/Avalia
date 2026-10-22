@@ -5,6 +5,7 @@ import { requerirAdmin } from '@/lib/auth/guardas';
 const ITEMS: ItemNav[] = [
   { href: '/admin', texto: 'Instituciones', icono: 'edificio', exacto: true },
   { href: '/admin/metricas', texto: 'Métricas', icono: 'grafico' },
+  { href: '/admin/consultas', texto: 'Consultas', icono: 'mail' },
 ];
 
 // Cada página vuelve a llamar a su guarda: el layout no se vuelve a ejecutar al navegar.

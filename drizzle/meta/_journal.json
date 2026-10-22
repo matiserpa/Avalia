@@ -15,6 +15,13 @@
       "when": 1792614012303,
       "tag": "0001_tipo_jornada",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792680012251,
+      "tag": "0002_consultas",
+      "breakpoints": true
     }
   ]
 }

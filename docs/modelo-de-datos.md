@@ -13,6 +13,7 @@ usuarios ─┬── perfiles (1 a 1, solo profesionales)
 
 codigos_ingreso   (por mail, antes de que exista o se identifique la cuenta)
 correos           (registro de mails; en demo, bandeja en pantalla)
+consultas         (formulario de contacto del sitio comercial)
 imagenes          (logos y fotos, en la base)
 ```
 
@@ -104,6 +105,13 @@ Logos y fotos, achicados a 512 px en WebP y guardados en la base. Se sirven por 
 
 - Los logos son públicos.
 - Una foto es pública solo si su perfil está publicado. Si no, la ven solo su dueña y el admin.
+
+### `consultas`
+Lo que llega desde el formulario de contacto del sitio comercial (`/contacto`): tipo (instituto, asociación, congreso, profesional u otro), nombre, mail, teléfono, institución, ciudad y mensaje. Guarda cuándo aceptó el aviso de privacidad y la versión de los textos legales.
+
+- **Se borran solas a los 12 meses** de llegar, como dice la política de privacidad. Desde `/admin/consultas` se marcan como respondidas o se borran antes.
+- **Contra el spam:** un campo trampa invisible, hasta 3 por mail por día y hasta 60 por hora en total.
+- **En modo demo no se guarda nada:** el panel de administración de la demo lo puede abrir cualquiera.
 
 ## Qué se borra al borrar una cuenta
 

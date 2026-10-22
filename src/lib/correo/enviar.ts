@@ -16,6 +16,8 @@ export type Correo = {
   // Nombre de la plantilla, para el registro: 'codigo', 'certificado', 'invitacion'...
   plantilla: string;
   certificadoId?: string;
+  // A quién le llega la respuesta si se contesta el mail (las consultas del sitio).
+  responderA?: string;
 };
 
 export type ResultadoEnvio = { ok: true } | { ok: false; error: string };
@@ -70,7 +72,14 @@ export async function enviarCorreos(lista: Correo[]): Promise<ResultadoEnvio[]> 
             'x-batch-validation': 'permissive',
           },
           body: JSON.stringify(
-            lote.map((c) => ({ from: remitente(), to: [c.para], subject: c.asunto, html: c.html, text: c.texto })),
+            lote.map((c) => ({
+              from: remitente(),
+              to: [c.para],
+              subject: c.asunto,
+              html: c.html,
+              text: c.texto,
+              ...(c.responderA ? { reply_to: c.responderA } : {}),
+            })),
           ),
         });
         const cuerpo = (await r.json().catch(() => ({}))) as {

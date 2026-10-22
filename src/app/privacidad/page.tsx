@@ -39,6 +39,10 @@ export default function Privacidad() {
         </ul>
         <p>Si sos parte de una institución: tu mail, para ingresar al panel.</p>
         <p>
+          Si nos escribís desde el <Link href="/contacto" className="font-semibold underline underline-offset-4">formulario de contacto</Link>: tu nombre, tu mail, tu teléfono si lo dejás, tu
+          institución, tu ciudad y tu mensaje, y el momento en que aceptaste este aviso.
+        </p>
+        <p>
           Si visitás un perfil o verificás un certificado: no te pedimos ningún dato. Contamos cuántas visitas y
           verificaciones hubo y por qué medio llegaron (por ejemplo, un QR), sin guardar tu IP, tu navegador ni cookies de
           seguimiento.
@@ -54,6 +58,7 @@ export default function Privacidad() {
           <li>Para mostrar tu perfil, sólo si vos decidís publicarlo.</li>
           <li>Para mandarte los mails necesarios: el código para ingresar y los avisos de certificados nuevos.</li>
           <li>Para medir el piloto con números generales (cuántos pasaportes se activan, cuántos perfiles se comparten y cuántos certificados se verifican).</li>
+          <li>Si nos escribiste desde el formulario de contacto: sólo para responderte. No te sumamos a ninguna lista de envíos.</li>
         </ul>
         <p>No vendemos tus datos ni los usamos para publicidad.</p>
       </Seccion>
@@ -133,6 +138,10 @@ export default function Privacidad() {
       <Seccion titulo="Cuánto tiempo guardamos los datos">
         <p>
           Mientras tengas tu cuenta y dure el piloto. <Completar>plazo de conservación al terminar el piloto</Completar>
+        </p>
+        <p>
+          Las consultas del formulario de contacto, 12 meses desde que llegan: después se borran solas. Si querés que las
+          borremos antes, escribinos.
         </p>
       </Seccion>
 

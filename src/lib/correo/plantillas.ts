@@ -84,3 +84,53 @@ ${boton('Ingresar al panel', d.enlace)}
   const texto = `Hola:\n\nTe dimos acceso al panel de ${d.institucion} en ${MARCA.nombre}.\n\nIngresá acá: ${d.enlace}\n\nTe vamos a mandar un código a este mail para entrar.`;
   return { para: d.para, asunto, html, texto, plantilla: 'invitacion' };
 }
+
+// Aviso a la agencia de una consulta nueva del sitio. Todo lo que escribió la persona va escapado.
+// Contestando el mail se le responde a ella (responderA).
+export function correoConsulta(d: {
+  para: string;
+  tipo: string;
+  nombre: string;
+  email: string;
+  telefono: string | null;
+  organizacion: string | null;
+  ciudad: string | null;
+  mensaje: string | null;
+  enlace: string;
+}): Correo {
+  const quien = (d.organizacion || d.nombre).replace(/\s+/g, ' ').slice(0, 80);
+  const asunto = `Consulta nueva: ${quien}`;
+  const filas: [string, string | null][] = [
+    ['Es', d.tipo],
+    ['Nombre', d.nombre],
+    ['Institución u organización', d.organizacion],
+    ['Ciudad', d.ciudad],
+    ['Mail', d.email],
+    ['Teléfono', d.telefono],
+  ];
+  const html = marco(
+    `${d.nombre} escribió desde el sitio.`,
+    `<p style="margin:0 0 16px;">Llegó una consulta desde el sitio de ${escapar(MARCA.nombre)}.</p>
+<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;font-size:15px;line-height:1.5;">
+${filas
+  .filter(([, v]) => v)
+  .map(
+    ([k, v]) =>
+      `<tr><td style="padding:4px 12px 4px 0;color:${C.suave};vertical-align:top;white-space:nowrap;">${escapar(k)}</td><td style="padding:4px 0;font-weight:600;">${escapar(v!)}</td></tr>`,
+  )
+  .join('\n')}
+</table>
+${d.mensaje ? `<p style="margin:16px 0 0;padding:14px 16px;background:${C.marfil};border-radius:12px;white-space:pre-wrap;">${escapar(d.mensaje)}</p>` : ''}
+${boton('Ver las consultas', d.enlace)}
+<p style="margin:0;font-size:14px;color:${C.suave};">Si contestás este mail, la respuesta le llega a ${escapar(d.email)}.</p>`,
+  );
+  const texto = [
+    `Llegó una consulta desde el sitio de ${MARCA.nombre}.`,
+    '',
+    ...filas.filter(([, v]) => v).map(([k, v]) => `${k}: ${v}`),
+    ...(d.mensaje ? ['', d.mensaje] : []),
+    '',
+    `Ver las consultas: ${d.enlace}`,
+  ].join('\n');
+  return { para: d.para, asunto, html, texto, plantilla: 'consulta', responderA: d.email };
+}

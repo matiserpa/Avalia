@@ -33,6 +33,13 @@ Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice q
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
+**Dirección provisoria.** Mientras no haya dominio propio, el proyecto de Vercel puede usar una dirección gratis del tipo `algo.vercel.app`:
+1. En el proyecto, **Settings → Domains → Add Domain**, escribir `avalya.vercel.app` y confirmar. Si está tomada, Vercel avisa: probar `avalya-demo.vercel.app` o `avalya-piloto.vercel.app`.
+2. En **Settings → Environment Variables**, agregar `APP_URL` con esa dirección completa (por ejemplo `https://avalya.vercel.app`), para que los links, los QR y los PDF la usen.
+3. **Deployments → Redeploy** del último despliegue.
+
+La dirección anterior sigue andando. Cuando llegue el dominio propio, se cambia `APP_URL` y se vuelve a desplegar. Los QR que se hayan impreso con la dirección provisoria dejan de servir si esa dirección se da de baja, así que no se imprime nada con ella.
+
 **En el iPhone, como una app.** Abrir la dirección en Safari, tocar el botón de compartir y elegir **Agregar a inicio**. Queda el ícono de Avalya en la pantalla de inicio y se abre sin la barra del navegador (`src/app/manifest.ts` y `src/app/apple-icon.tsx`). En Android, desde Chrome: menú y **Agregar a la pantalla principal**. La sesión de la app es aparte de la de Safari: la primera vez hay que entrar de nuevo.
 
 Sobre el plan: Vercel considera comercial mostrarle la demo a clientes, y eso pide el plan Pro (ver "Hosting: Vercel"). Para mirarla internamente alcanza el gratis. Si después se agrega un dominio propio (`demo.<dominio>`), conviene definir `APP_URL` con esa dirección, para que los QR de la demo la usen.
