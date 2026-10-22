@@ -134,3 +134,16 @@ ${boton('Ver las consultas', d.enlace)}
   ].join('\n');
   return { para: d.para, asunto, html, texto, plantilla: 'consulta', responderA: d.email, asuntoRegistro: `Consulta nueva (${d.tipo})` };
 }
+
+// Al llegar al tope diario de avisos de consultas: uno solo, sin datos de nadie.
+export function correoTopeConsultas(d: { para: string; tope: number; enlace: string }): Correo {
+  const asunto = `Llegaron más de ${d.tope} consultas en 24 horas`;
+  const html = marco(
+    'Las siguientes se ven sólo en el panel.',
+    `<p style="margin:0 0 12px;">Llegaron más de ${d.tope} consultas desde el sitio en las últimas 24 horas.</p>
+<p style="margin:0;">Para no gastar el cupo de mails que necesitan los códigos de ingreso y los certificados, las siguientes no avisan por mail: se ven en el panel.</p>
+${boton('Ver las consultas', d.enlace)}`,
+  );
+  const texto = `Llegaron más de ${d.tope} consultas desde el sitio en las últimas 24 horas. Las siguientes no avisan por mail: se ven en el panel.\n\nVer las consultas: ${d.enlace}`;
+  return { para: d.para, asunto, html, texto, plantilla: 'consultas-tope' };
+}

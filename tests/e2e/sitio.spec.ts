@@ -94,6 +94,22 @@ test.describe('sitio comercial', () => {
     expect(r.headers()['content-type']).toBe('image/png');
     expect((await request.get('/imagenes/sitio/otra')).status()).toBe(404);
   });
+
+  test('las páginas de pacientes conservan su imagen al compartir', async ({ page, request }) => {
+    const casos: [string, string][] = [
+      ['/verificar', '/verificar/opengraph-image'],
+      ['/v/VR4K7M2P', '/opengraph-image'],
+      ['/p/valentina-rios', '/p/valentina-rios/opengraph-image'],
+    ];
+    for (const [ruta, imagen] of casos) {
+      await page.goto(ruta);
+      const og = (await page.locator('meta[property="og:image"]').first().getAttribute('content')) ?? '';
+      expect(og, ruta).toContain(imagen);
+      expect(og, ruta).not.toContain('/imagenes/sitio/');
+      const r = await request.get(new URL(og).pathname + new URL(og).search);
+      expect(r.headers()['content-type'], ruta).toBe('image/png');
+    }
+  });
 });
 
 test.describe('formulario de contacto', () => {

@@ -36,7 +36,8 @@ export default async function Consultas() {
       )}
       {lista.length === 0 ? (
         <EstadoVacio icono="mail" titulo="Todavía no llegó ninguna consulta" nivel="h2">
-          Cuando alguien escriba desde el sitio, la vas a ver acá. Además le avisamos por mail a {MARCA.emailContacto}.
+          Cuando alguien escriba desde el sitio, la vas a ver acá. Además le avisamos por mail a {MARCA.emailContacto}, hasta 10
+          consultas por día; si llegan más, avisamos una vez y el resto se ve sólo acá.
         </EstadoVacio>
       ) : (
         <ul className="max-w-3xl space-y-4">

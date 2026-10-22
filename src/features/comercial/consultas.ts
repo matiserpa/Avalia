@@ -7,7 +7,10 @@
 //   responderle) y un tope general por hora. No hay tope por IP porque no guardamos IP.
 // - Los avisos por mail también tienen tope por día: salen por la misma cuenta que los códigos
 //   para ingresar y los certificados, y una tanda de consultas falsas no puede agotar ese cupo.
-//   Pasado el tope, las consultas se guardan igual y se ven en /admin/consultas.
+//   Al llegar al tope sale un único aviso de que hay más; las siguientes se guardan igual y se
+//   ven en /admin/consultas.
+// - Los conteos y el guardado van en una transacción con un candado: con pedidos en paralelo
+//   (en Vercel, cada uno en su instancia) los topes no se pueden saltear.
 // - En modo demo no se guarda ni se manda nada: el sitio de la demo es público y cualquiera entra
 //   al panel de administración, así que lo que alguien escriba de verdad quedaría a la vista.
 // - El aviso a la agencia sale después de responder (`programar`), para no demorar la respuesta.
@@ -15,13 +18,13 @@
 //   diaria (src/app/tareas/diaria/route.ts) y, además, al recibir una consulta o abrir el panel.
 
 import 'server-only';
-import { and, count, desc, eq, gt, lt } from 'drizzle-orm';
+import { and, count, desc, eq, gt, lt, sql } from 'drizzle-orm';
 import { db } from '@/db';
 import { consultas, TIPOS_CONSULTA, type TipoConsulta } from '@/db/schema';
 import { MARCA } from '@/config/marca';
 import { modoDemo, urlBase } from '@/lib/config';
 import { enviarCorreo } from '@/lib/correo/enviar';
-import { correoConsulta } from '@/lib/correo/plantillas';
+import { correoConsulta, correoTopeConsultas } from '@/lib/correo/plantillas';
 import { VERSION_LEGALES } from '@/lib/legales';
 import { emailValido, normalizarEmail } from '@/lib/texto';
 
@@ -140,30 +143,43 @@ export async function recibirConsulta(
 
   await borrarVencidas();
   const ahora = Date.now();
-  const [{ porMail }] = await db
-    .select({ porMail: count() })
-    .from(consultas)
-    .where(and(eq(consultas.email, v.valores.email), gt(consultas.creadaEn, new Date(ahora - 24 * 60 * 60 * 1000))));
-  if (porMail >= MAX_POR_MAIL_POR_DIA) return { ok: true, demo: false };
+  const haceUnDia = new Date(ahora - 24 * 60 * 60 * 1000);
+  const r = await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(7302026)`);
+    const [{ porMail }] = await tx
+      .select({ porMail: count() })
+      .from(consultas)
+      .where(and(eq(consultas.email, v.valores.email), gt(consultas.creadaEn, haceUnDia)));
+    if (porMail >= MAX_POR_MAIL_POR_DIA) return { estado: 'descartada' as const };
+    const [{ enLaHora }] = await tx
+      .select({ enLaHora: count() })
+      .from(consultas)
+      .where(gt(consultas.creadaEn, new Date(ahora - 60 * 60 * 1000)));
+    if (enLaHora >= MAX_POR_HORA) return { estado: 'muchas' as const };
+    // Las de las últimas 24 horas antes de esta: decide si esta lleva aviso.
+    const [{ enElDia }] = await tx.select({ enElDia: count() }).from(consultas).where(gt(consultas.creadaEn, haceUnDia));
+    const [fila] = await tx
+      .insert(consultas)
+      .values({ ...v.valores, aceptoPrivacidadEn: new Date(ahora), versionLegales: VERSION_LEGALES })
+      .returning();
+    return { estado: 'guardada' as const, fila, previas: enElDia };
+  });
 
-  const [{ enLaHora }] = await db
-    .select({ enLaHora: count() })
-    .from(consultas)
-    .where(gt(consultas.creadaEn, new Date(ahora - 60 * 60 * 1000)));
-  if (enLaHora >= MAX_POR_HORA) {
+  if (r.estado === 'descartada') return { ok: true, demo: false };
+  if (r.estado === 'muchas') {
     return { ok: false, error: `Estamos recibiendo muchas consultas. Probá de nuevo en un rato o escribinos a ${MARCA.emailContacto}.` };
   }
-
-  const [fila] = await db
-    .insert(consultas)
-    .values({ ...v.valores, aceptoPrivacidadEn: new Date(ahora), versionLegales: VERSION_LEGALES })
-    .returning();
-
-  const [{ enElDia }] = await db
-    .select({ enElDia: count() })
-    .from(consultas)
-    .where(gt(consultas.creadaEn, new Date(ahora - 24 * 60 * 60 * 1000)));
-  if (enElDia > MAX_AVISOS_POR_DIA) return { ok: true, demo: false };
+  const { fila, previas } = r;
+  const enlace = `${urlBase()}/admin/consultas`;
+  if (previas > MAX_AVISOS_POR_DIA) return { ok: true, demo: false };
+  if (previas === MAX_AVISOS_POR_DIA) {
+    // Un único aviso de que hay más, sin datos de nadie; el resto se ve en el panel.
+    await programar(async () => {
+      const envio = await enviarCorreo(correoTopeConsultas({ para: MARCA.emailContacto, tope: MAX_AVISOS_POR_DIA, enlace }));
+      if (!envio.ok) console.error('No salió el aviso de tope de consultas.');
+    });
+    return { ok: true, demo: false };
+  }
 
   await programar(async () => {
     const envio = await enviarCorreo(
@@ -176,7 +192,7 @@ export async function recibirConsulta(
         organizacion: fila.organizacion,
         ciudad: fila.ciudad,
         mensaje: fila.mensaje,
-        enlace: `${urlBase()}/admin/consultas`,
+        enlace,
       }),
     );
     if (!envio.ok) console.error('No salió el aviso de una consulta nueva.');

@@ -89,15 +89,15 @@ function Anulado({ c, consultado }: { c: CertificadoVerificado; consultado: stri
     <>
       <section aria-labelledby="resultado" className="@container overflow-hidden rounded-tarjeta border border-error/25 bg-papel shadow-elevada">
         <EncabezadoResultado tono="error" icono="cruz" titulo="Certificado anulado" consultado={consultado} />
-        <div className="space-y-6 px-5 py-6 sm:px-8 sm:py-8">
+        <div className="space-y-6 px-5 py-6 @md:px-8 @md:py-8">
           <p className="text-[1.125rem]">
             {c.institucion.nombre} anuló este certificado
             {c.anuladoEn ? ` el ${fechaLarga(c.anuladoEn)}` : ''}. <strong>Ya no tiene validez.</strong>
           </p>
-          <div className="rounded-2xl border border-borde-suave bg-marfil p-4 sm:p-5">
+          <div className="rounded-2xl border border-borde-suave bg-marfil p-4 @md:p-5">
             <p className="mb-4 text-[0.9375rem] font-semibold text-tinta-suave">Datos del certificado anulado</p>
             <CursoCertificado c={c} />
-            <dl className="mt-5 grid gap-5 sm:grid-cols-2">
+            <dl className="mt-5 grid gap-5 @md:grid-cols-2">
               <Dato termino="Titular">{titular}</Dato>
               <Dato termino="Emitido por">
                 <InstitucionCertificado c={c} />
@@ -108,7 +108,7 @@ function Anulado({ c, consultado }: { c: CertificadoVerificado; consultado: stri
             </dl>
           </div>
         </div>
-        <div className="flex gap-3 border-t border-borde-suave bg-crema-claro px-5 py-4 text-[0.9375rem] sm:px-8">
+        <div className="flex gap-3 border-t border-borde-suave bg-crema-claro px-5 py-4 text-[0.9375rem] @md:px-8">
           <Icono nombre="info" className="mt-0.5 size-5 shrink-0 text-tierra" />
           <p>Si te lo presentaron como vigente, consultá con {c.institucion.nombre}: puede haber emitido uno nuevo con otro código.</p>
         </div>
@@ -123,7 +123,7 @@ function NoEncontrado({ codigo, consultado }: { codigo: string | null; consultad
     <>
       <section aria-labelledby="resultado" className="@container overflow-hidden rounded-tarjeta border border-borde-suave bg-papel shadow-elevada">
         <EncabezadoResultado tono="tierra" icono="lupa" titulo="No encontramos este certificado" consultado={consultado} />
-        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-8">
+        <div className="space-y-5 px-5 py-6 @md:px-8 @md:py-8">
           <p className="text-[1.125rem]">
             {codigo ? (
               <>

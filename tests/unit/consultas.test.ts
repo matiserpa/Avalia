@@ -92,10 +92,18 @@ describe('recibir una consulta', () => {
     expect(c.asuntoRegistro).toBe('Consulta nueva (Profesional)');
   });
 
-  it('después de 10 avisos en el día, las consultas se guardan sin avisar (no agotan el cupo de mails)', async () => {
-    for (let i = 0; i < 12; i++) expect((await recibirConsulta({ ...base, email: `persona${i}@demo.example` })).ok).toBe(true);
-    expect(await db.select().from(consultas)).toHaveLength(12);
-    expect(await db.select().from(correos)).toHaveLength(10);
+  it('después de 10 avisos en el día, avisa una vez que hay más y el resto se guarda sin aviso', async () => {
+    for (let i = 0; i < 13; i++) expect((await recibirConsulta({ ...base, email: `persona${i}@demo.example` })).ok).toBe(true);
+    expect(await db.select().from(consultas)).toHaveLength(13);
+    const mails = await db.select().from(correos);
+    expect(mails).toHaveLength(11);
+    expect(mails.filter((m) => m.plantilla === 'consultas-tope')).toHaveLength(1);
+  });
+
+  it('los topes aguantan pedidos en paralelo', async () => {
+    const r = await Promise.all(Array.from({ length: 6 }, () => recibirConsulta(base)));
+    expect(r.every((x) => x.ok)).toBe(true);
+    expect(await db.select().from(consultas)).toHaveLength(3);
   });
 
   it('escapa lo que escribió la persona en el aviso', async () => {
