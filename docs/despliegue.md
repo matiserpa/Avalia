@@ -36,6 +36,10 @@ Si el sitio muestra "Falta terminar de configurar el sitio", esa pantalla dice q
 
 La cadena de Neon trae `channel_binding=require` y la de Supabase trae `supa` y `pgbouncer`: el código los saca antes de conectarse (`urlDeLaBase` en `src/db/index.ts`). Si Vercel arranca varias copias del sitio a la vez con la base vacía, la primera la arma y las demás esperan (`conCandado` en `src/db/migrar.ts`).
 
+**Si Vercel no publica los cambios nuevos.** En el plan gratis (Hobby), Vercel bloquea el despliegue automático de un commit cuyo autor no es la persona dueña del proyecto: en **Deployments** aparece como "Blocked" y "Redeploy" vuelve a publicar la versión anterior, no la nueva. Dos salidas:
+- Publicar a mano la última versión: **Deployments → Create Deployment**, elegir la rama `main` y confirmar.
+- Que los commits que van a `main` lleven como autor el mail de la cuenta de GitHub dueña del proyecto en Vercel.
+
 **Dirección provisoria.** Mientras no haya dominio propio, el proyecto de Vercel puede usar una dirección gratis del tipo `algo.vercel.app`:
 1. En el proyecto, **Settings → Domains → Add Domain**, escribir `avalya.vercel.app` y confirmar. Si está tomada, Vercel avisa: probar `avalya-demo.vercel.app` o `avalya-piloto.vercel.app`.
 2. En **Settings → Environment Variables**, agregar `APP_URL` con esa dirección completa (por ejemplo `https://avalya.vercel.app`), para que los links, los QR y los PDF la usen.
